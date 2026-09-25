@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中五數學科：圖解一元二次不等式 </title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for rendering equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans HK', 'Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#7e22ce',
+                            pink: '#ec4899',
+                            cyan: '#06b6d4',
+                            amber: '#f59e0b',
+                            emerald: '#10b981',
+                            indigo: '#6366f1'
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s infinite alternate',
+                        'bounce-subtle': 'bounceSubtle 1.5s infinite',
+                        'float': 'float 3s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { boxShadow: '0 0 15px rgba(236, 72, 153, 0.4)' },
+                            '100%': { boxShadow: '0 0 30px rgba(6, 182, 212, 0.8)' }
+                        },
+                        bounceSubtle: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-6px)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans HK', sans-serif;
+            background: #090d16;
+            color: #f8fafc;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(126, 34, 206, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .colorful-glass {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .neon-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .neon-card:hover {
+            border-color: rgba(236, 72, 153, 0.6);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.3);
+        }
+
+        .btn-gradient-primary {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%);
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+        }
+
+        .btn-gradient-primary:hover {
+            background: linear-gradient(135deg, #f43f5e 0%, #a855f7 50%, #2563eb 100%);
+            box-shadow: 0 6px 25px rgba(236, 72, 153, 0.6);
+        }
+
+        .btn-gradient-emerald {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .glow-text-cyan {
+            text-shadow: 0 0 12px rgba(6, 182, 212, 0.8);
+        }
+
+        .glow-text-pink {
+            text-shadow: 0 0 12px rgba(236, 72, 153, 0.8);
+        }
+
+        canvas {
+            touch-action: none;
+        }
+
+        /* MathJax Custom Color Overrides */
+        .MathJax_Display {
+            margin: 0 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-pink-500 selection:text-white">
+
+    <!-- Top Navigation & Score Header -->
+    <header class="sticky top-0 z-50 border-b border-pink-500/20 bg-slate-950/80 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Game Title & Mascot Icon -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-0.5 shadow-lg shadow-pink-500/30 animate-pulse-glow flex items-center justify-center">
+                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                        <i class="fa-solid fa-square-root-variable text-2xl bg-gradient-to-r from-pink-400 to-cyan-300 bg-clip-text text-transparent"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-black text-lg sm:text-2xl tracking-tight bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-300 bg-clip-text text-transparent flex items-center gap-2">
+                        「一元不等式」數學小教室 <span class="text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/40 font-bold hidden sm:inline-block">PLKYLS 中五級 數學科</span>
+                    </h1>
+                    <p class="text-xs font-semibold text-slate-400">目標：2.2 圖解法解一元二次不等式</p>
+                </div>
+            </div>
+
+            <!-- Header Gamified Score & Streak Counter -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <div class="flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 px-3 py-1.5 rounded-xl">
+                    <i class="fa-solid fa-fire text-amber-400 text-lg animate-bounce-subtle"></i>
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-amber-300/80 leading-none">連勝次數</div>
+                        <span id="streak-counter" class="text-base sm:text-lg font-black text-amber-300 font-mono">0</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/40 px-3 py-1.5 rounded-xl">
+                    <i class="fa-solid fa-trophy text-yellow-400 text-lg"></i>
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-cyan-300/80 leading-none">積分</div>
+                        <span id="score-counter" class="text-base sm:text-lg font-black text-cyan-300 font-mono">0</span>
+                    </div>
+                </div>
+
+                <button id="sound-toggle-btn" class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:border-pink-500 transition">
+                    <i class="fa-solid fa-volume-high text-lg text-pink-400" id="sound-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Interactive Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
+
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-3 border-b border-slate-800 pb-2 overflow-x-auto scrollbar-none">
+            <button onclick="switchMode('explore')" id="tab-explore" class="nav-tab px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/30 whitespace-nowrap">
+                <i class="fa-solid fa-compass text-cyan-300"></i> 【一】圖解概念原理探究
+            </button>
+            <button onclick="switchMode('game')" id="tab-game" class="nav-tab px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                <i class="fa-solid fa-gamepad text-pink-400"></i> 【二】DSE 關卡大挑戰
+            </button>
+            <button onclick="switchMode('sandbox')" id="tab-sandbox" class="nav-tab px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                <i class="fa-solid fa-flask-vial text-emerald-400"></i> 【三】抛物線繪圖實驗室
+            </button>
+        </div>
+
+        <!-- ==================== MODULE 1: CONCEPT EXPLORATION ==================== -->
+        <div id="view-explore" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Step-by-Step Graphical Tutorial Card -->
+                <div class="lg:col-span-5 space-y-5">
+                    <div class="colorful-glass p-6 rounded-3xl space-y-5 relative overflow-hidden">
+                        <div class="absolute -top-12 -right-12 w-36 h-36 bg-pink-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> 圖解二次不等式 4 大核心步驟
+                            </h2>
+                            <span class="text-xs bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2.5 py-1 rounded-full font-bold">DSE 必考法寶</span>
+                        </div>
+
+                        <!-- Step List -->
+                        <div class="space-y-3">
+                            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-cyan-500/30 flex items-start gap-3">
+                                <div class="w-6 h-6 rounded-xl bg-cyan-500/20 text-cyan-300 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</div>
+                                <div class="text-xs space-y-1">
+                                    <strong class="text-cyan-200 block text-sm font-bold">求 x 軸截距</strong>
+                                    解方程 \( ax^2 + bx + c = 0 \)，利用因式分解法或公式求出根 \(\alpha\) 及 \(\beta\)。
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-purple-500/30 flex items-start gap-3">
+                                <div class="w-6 h-6 rounded-xl bg-purple-500/20 text-purple-300 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</div>
+                                <div class="text-xs space-y-1">
+                                    <strong class="text-purple-200 block text-sm font-bold">判斷拋物線開口方向</strong>
+                                    • 若 \(a > 0\)：開口<b>向上 (∪)</b><br>
+                                    • 若 \(a < 0\)：開口<b>向下 (∩)</b>
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-pink-500/30 flex items-start gap-3">
+                                <div class="w-6 h-6 rounded-xl bg-pink-500/20 text-pink-300 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</div>
+                                <div class="text-xs space-y-1">
+                                    <strong class="text-pink-200 block text-sm font-bold">對照目標不等號區域</strong>
+                                    • \(y > 0\) 或 \(\ge 0\)：取 <b>x 軸上方</b> 圖像（螢光藍）<br>
+                                    • \(y < 0\) 或 \(\le 0\)：取 <b>x 軸下方</b> 圖像（霓虹粉）
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-amber-500/30 flex items-start gap-3">
+                                <div class="w-6 h-6 rounded-xl bg-amber-500/20 text-amber-300 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">4</div>
+                                <div class="text-xs space-y-1">
+                                    <strong class="text-amber-200 block text-sm font-bold">讀出 x 軸投影範圍（最終解）</strong>
+                                    注意：大於小於號「不含邊界」畫<b>空心點</b>；包含等於號「含邊界」畫<b>實心點</b>。
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Controls -->
+                        <div class="space-y-4 pt-3 border-t border-slate-800">
+                            <h3 class="text-xs font-black text-slate-200 flex items-center gap-1.5">
+                                <i class="fa-solid fa-sliders text-cyan-400"></i> 動態參數實時觀察：
+                            </h3>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1.5">
+                                    <span class="text-slate-300">二次項係數 \(a\) (方向)：</span>
+                                    <span id="explore-a-val" class="text-cyan-400 font-mono">a = 1 (開口向上 ∪)</span>
+                                </div>
+                                <input type="range" id="explore-slider-a" min="-10" max="10" step="1" value="1" oninput="updateExploreGraph()" class="w-full accent-cyan-400 h-2 bg-slate-800 rounded-lg cursor-pointer">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1.5">不等號：</label>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <button onclick="setExploreSign('>')" id="exp-sign-gt" class="py-2 rounded-xl border-2 border-cyan-500 bg-cyan-950/60 text-cyan-300 font-black text-sm transition">&gt;</button>
+                                    <button onclick="setExploreSign('>=')" id="exp-sign-gte" class="py-2 rounded-xl border-2 border-slate-800 bg-slate-900 text-slate-400 font-black text-sm transition">&ge;</button>
+                                    <button onclick="setExploreSign('<')" id="exp-sign-lt" class="py-2 rounded-xl border-2 border-slate-800 bg-slate-900 text-slate-400 font-black text-sm transition">&lt;</button>
+                                    <button onclick="setExploreSign('<=')" id="exp-sign-lte" class="py-2 rounded-xl border-2 border-slate-800 bg-slate-900 text-slate-400 font-black text-sm transition">&le;</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Dynamic Graphic Canvas -->
+                <div class="lg:col-span-7 space-y-4 flex flex-col">
+                    <div class="colorful-glass p-6 rounded-3xl flex-grow flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-chart-line text-cyan-400"></i> 動態拋物線實時圖解畫布
+                                </h3>
+                                <div class="flex items-center gap-3 text-xs font-bold">
+                                    <span class="flex items-center gap-1.5 text-cyan-300"><span class="w-3 h-3 rounded-full bg-cyan-400 inline-block shadow-sm shadow-cyan-400"></span> x軸上方 (\(y > 0\))</span>
+                                    <span class="flex items-center gap-1.5 text-pink-400"><span class="w-3 h-3 rounded-full bg-pink-500 inline-block shadow-sm shadow-pink-500"></span> x軸下方 (\(y < 0\))</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-950 rounded-2xl p-3 border-2 border-slate-800/80 shadow-inner">
+                                <canvas id="explore-canvas" width="600" height="340" class="w-full rounded-xl bg-slate-950"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Real-time Live Inequality & Solution Display -->
+                        <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-purple-950/40 to-slate-900 border border-purple-500/30 space-y-2">
+                            <div class="text-xs font-bold text-slate-400">當前一元二次不等式：</div>
+                            <div id="explore-equation-text" class="text-lg sm:text-xl font-black text-cyan-300 glow-text-cyan">
+                                \( x^2 - 2x - 3 > 0 \)
+                            </div>
+                            <div class="border-t border-slate-800/80 pt-2 flex flex-wrap items-center justify-between text-xs sm:text-sm gap-2">
+                                <span class="text-slate-300 font-bold">圖解對應最終解集：</span>
+                                <span id="explore-solution-text" class="font-mono font-black text-emerald-400 text-base sm:text-lg">
+                                    \( x < -1 \text{ 或 } x > 3 \)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODULE 2: DSE LEVEL CHALLENGE GAME ==================== -->
+        <div id="view-game" class="hidden space-y-6">
+            <!-- Level Selector Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <button onclick="selectGameLevel(1)" id="game-lvl-btn-1" class="p-3.5 rounded-2xl border-2 border-pink-500 bg-pink-950/40 text-left transition relative overflow-hidden">
+                    <div class="text-[10px] text-pink-400 font-black uppercase tracking-wider">第 1 關</div>
+                    <div class="font-black text-white text-sm">基礎開口向上</div>
+                    <div class="text-[11px] text-slate-400 font-semibold mt-0.5">相異兩實根 (\(a > 0\))</div>
+                </button>
+                <button onclick="selectGameLevel(2)" id="game-lvl-btn-2" class="p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100">
+                    <div class="text-[10px] text-purple-400 font-black uppercase tracking-wider">第 2 關</div>
+                    <div class="font-black text-white text-sm">基礎開口向下</div>
+                    <div class="text-[11px] text-slate-400 font-semibold mt-0.5">二次項變負 (\(a < 0\))</div>
+                </button>
+                <button onclick="selectGameLevel(3)" id="game-lvl-btn-3" class="p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100">
+                    <div class="text-[10px] text-cyan-400 font-black uppercase tracking-wider">第 3 關</div>
+                    <div class="font-black text-white text-sm">完全平方式</div>
+                    <div class="text-[11px] text-slate-400 font-semibold mt-0.5">相切一點 (\(\Delta = 0\))</div>
+                </button>
+                <button onclick="selectGameLevel(4)" id="game-lvl-btn-4" class="p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100">
+                    <div class="text-[10px] text-emerald-400 font-black uppercase tracking-wider">第 4 關</div>
+                    <div class="font-black text-white text-sm">完全「離地」</div>
+                    <div class="text-[11px] text-slate-400 font-semibold mt-0.5">所有實數 / 無解 (\(\Delta < 0\))</div>
+                </button>
+                <button onclick="selectGameLevel(5)" id="game-lvl-btn-5" class="p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100 col-span-2 sm:col-span-1">
+                    <div class="text-[10px] text-amber-400 font-black uppercase tracking-wider">第 5 關</div>
+                    <div class="font-black text-amber-300 text-sm">DSE 歷屆模擬題</div>
+                    <div class="text-[11px] text-slate-400 font-semibold mt-0.5">文憑試多項選擇題速評</div>
+                </button>
+            </div>
+
+            <!-- Quiz Display Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Question & Choices -->
+                <div class="lg:col-span-7 space-y-5">
+                    <div class="colorful-glass p-6 rounded-3xl space-y-5 shadow-2xl relative">
+                        <div class="flex justify-between items-center">
+                            <span id="game-question-badge" class="px-3.5 py-1 rounded-full text-xs font-black bg-pink-500/20 text-pink-300 border border-pink-500/40">
+                                關卡 1 - 第 1/2 題
+                            </span>
+                            <span class="text-xs font-bold text-cyan-300 flex items-center gap-1">
+                                <i class="fa-solid fa-lightbulb"></i> 請運用圖解法概念回答
+                            </span>
+                        </div>
+
+                        <!-- Problem Box -->
+                        <div class="py-6 px-4 bg-slate-950/90 rounded-2xl border-2 border-slate-800 text-center space-y-2">
+                            <div class="text-xs font-bold text-slate-400">求下列一元二次不等式的解集：</div>
+                            <div id="game-problem-tex" class="text-2xl sm:text-3xl font-black text-white min-h-[60px] flex items-center justify-center">
+                                \( x^2 - 5x + 6 > 0 \)
+                            </div>
+                        </div>
+
+                        <!-- MCQ Buttons Container -->
+                        <div id="game-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step DSE Explanation Box -->
+                    <div id="game-solution-card" class="hidden colorful-glass p-6 rounded-3xl border-2 border-emerald-500/40 bg-emerald-950/20 space-y-4">
+                        <div class="flex items-center gap-2 text-emerald-400 font-black text-base">
+                            <i class="fa-solid fa-circle-check text-xl"></i>
+                            <span>DSE 官方標準圖解法題解步驟</span>
+                        </div>
+                        <div id="game-solution-text" class="text-xs sm:text-sm text-slate-200 space-y-2 leading-relaxed">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                        <button onclick="nextGameQuestion()" class="w-full py-3.5 btn-gradient-emerald font-black rounded-2xl text-white text-sm sm:text-base flex items-center justify-center gap-2 transition">
+                            <span>繼續下一題</span> <i class="fa-solid fa-circle-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Realtime Graphic Sketch Preview -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="colorful-glass p-5 rounded-3xl space-y-3">
+                        <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-pencil text-pink-400"></i> 本題拋物線草圖對照
+                        </h3>
+                        <div class="bg-slate-950 rounded-2xl p-2.5 border-2 border-slate-800">
+                            <canvas id="game-canvas" width="450" height="270" class="w-full rounded-xl bg-slate-950"></canvas>
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                            <strong class="text-pink-300 block mb-1 font-extrabold">💡 答題口訣：</strong>
+                            找截距 → 睇開口 → 比對 \(>\) (取上方) 或 \(<\) (取下方)！
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODULE 3: PARABOLA SANDBOX ==================== -->
+        <div id="view-sandbox" class="hidden space-y-6">
+            <div class="colorful-glass p-6 rounded-3xl space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-white flex items-center gap-2">
+                        <i class="fa-solid fa-flask-vial text-emerald-400"></i> 自主二次不等式圖解實驗室 
+                    </h2>
+                    <p class="text-xs font-semibold text-slate-400 mt-1">輸入任意二次不等式的項，系統自動即時繪製拋物線並輸出該圖的判別式、開口方向、x 軸交點。</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Controls Column -->
+                    <div class="lg:col-span-5 space-y-4 bg-slate-900/90 p-5 rounded-2xl border border-slate-800">
+                        <div class="text-xs font-black text-cyan-300 uppercase tracking-wider">1. 輸入二次不等式參數： \( ax^2 + bx + c \)</div>
+
+                        <!-- Coefficients Inputs -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-300 mb-1">係數 a</label>
+                                <input type="number" id="sb-input-a" value="1" step="1" onchange="updateSandboxGraph()" oninput="updateSandboxGraph()" class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-2.5 text-sm text-cyan-300 font-mono font-black focus:border-pink-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-300 mb-1">係數 b</label>
+                                <input type="number" id="sb-input-b" value="-4" step="1" onchange="updateSandboxGraph()" oninput="updateSandboxGraph()" class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-2.5 text-sm text-cyan-300 font-mono font-black focus:border-pink-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-300 mb-1">常數 c</label>
+                                <input type="number" id="sb-input-c" value="3" step="1" onchange="updateSandboxGraph()" oninput="updateSandboxGraph()" class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-2.5 text-sm text-cyan-300 font-mono font-black focus:border-pink-500 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Inequality Sign Selector -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-300 mb-1">2. 選擇不等號類型</label>
+                            <select id="sb-select-op" onchange="updateSandboxGraph()" class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold focus:border-pink-500 outline-none">
+                                <option value=">">&gt; (大於 - 取 x 軸上方區域)</option>
+                                <option value=">=">&ge; (大於等於 - 含交點點集)</option>
+                                <option value="<">&lt; (小於 - 取 x 軸下方區域)</option>
+                                <option value="<=">&le; (小於等於 - 含交點點集)</option>
+                            </select>
+                        </div>
+
+                        <!-- Quick Presets -->
+                        <div class="space-y-2 border-t border-slate-800 pt-3">
+                            <label class="block text-[11px] font-bold text-slate-400">快速測試常考題型：</label>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <button onclick="loadSandboxPreset(1, -2, -3, '>')" class="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 font-mono font-bold text-left border border-slate-700">x² - 2x - 3 &gt; 0</button>
+                                <button onclick="loadSandboxPreset(-1, 2, 3, '>=')" class="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 font-mono font-bold text-left border border-slate-700">-x² + 2x + 3 &ge; 0</button>
+                                <button onclick="loadSandboxPreset(1, -6, 9, '>')" class="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 font-mono font-bold text-left border border-slate-700">x² - 6x + 9 &gt; 0 (Δ=0)</button>
+                                <button onclick="loadSandboxPreset(1, 0, 4, '<')" class="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 font-mono font-bold text-left border border-slate-700">x² + 4 &lt; 0 (無解)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Output Canvas & DSE steps -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="bg-slate-950 rounded-2xl p-3 border-2 border-slate-800">
+                            <canvas id="sandbox-canvas" width="550" height="280" class="w-full rounded-xl bg-slate-950"></canvas>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 text-xs">
+                            <div class="font-extrabold text-emerald-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-list-check"></i> 基本資料 :
+                            </div>
+                            <div id="sb-steps-output" class="text-slate-200 leading-relaxed font-mono space-y-1.5">
+                                <!-- Injected by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950/80 py-5 text-center text-xs font-semibold text-slate-500">
+        <p>PLKYLSC 數學科（必修部分）圖解一元二次不等式互動學習平台 &copy; 2026 STEM Math Lab.</p>
+    </footer>
+
+    <script>
+        /* ==================== SOUND SYNTHESIZER ==================== */
+        class SoundEffects {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playTone(freq, duration, type = 'sine') {
+                if (!this.enabled) return;
+                this.init();
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) {}
+            }
+            correct() {
+                if (!this.enabled) return;
+                this.playTone(523.25, 0.08);
+                setTimeout(() => this.playTone(659.25, 0.1), 80);
+                setTimeout(() => this.playTone(783.99, 0.2), 160);
+            }
+            wrong() {
+                if (!this.enabled) return;
+                this.playTone(220, 0.12, 'sawtooth');
+                setTimeout(() => this.playTone(185, 0.2, 'sawtooth'), 120);
+            }
+            click() {
+                if (!this.enabled) return;
+                this.playTone(800, 0.03, 'sine');
+            }
+        }
+        const sfx = new SoundEffects();
+
+        /* ==================== 100% TRADITIONAL CHINESE GAME QUESTIONS ==================== */
+        const GAME_LEVELS = {
+            1: [
+                {
+                    a: 1, b: -5, c: 6, op: '>',
+                    tex: "x^2 - 5x + 6 > 0",
+                    solutionSteps: [
+                        "1. 解方程 \(x^2 - 5x + 6 = 0 \implies (x-2)(x-3) = 0\)，得 x 軸截距為 \(x = 2\) 及 \(x = 3\)。",
+                        "2. 因二次項係數 \(a = 1 > 0\)，拋物線<b>開口向上 (∪)</b>。",
+                        "3. 不等號為 \(>\) (不含等於)，取 <b>x 軸上方</b> 的兩端曲線段 (畫空心點)。",
+                        "4. 投影至 x 軸，得出解集：<b>\\(x < 2 \\text{ 或 } x > 3\\)</b>"
+                    ],
+                    options: [
+                        { text: "\\(x < 2 \\text{ 或 } x > 3\\)", correct: true },
+                        { text: "\\(2 < x < 3\\)", correct: false },
+                        { text: "\\(x \\le 2 \\text{ 或 } x \\ge 3\\)", correct: false },
+                        { text: "\\(-3 < x < -2\\)", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 0, c: -4, op: '<=',
+                    tex: "x^2 - 4 \\le 0",
+                    solutionSteps: [
+                        "1. 解方程 \(x^2 - 4 = 0 \implies (x-2)(x+2) = 0\)，截距為 \(x = -2\) 及 \(x = 2\)。",
+                        "2. 係數 \(a = 1 > 0\)，拋物線<b>開口向上 (∪)</b>。",
+                        "3. 不等號為 \(\\le\) (含等於)，取 <b>x 軸下方 (含截距)</b> 的中間 U 型曲線段 (畫實心點)。",
+                        "4. 得出解集：<b>\\(-2 \\le x \\le 2\\)</b>"
+                    ],
+                    options: [
+                        { text: "\\(-2 \\le x \\le 2\\)", correct: true },
+                        { text: "\\(x \\le -2 \\text{ 或 } x \\ge 2\\)", correct: false },
+                        { text: "\\(-2 < x < 2\\)", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                }
+            ],
+            2: [
+                {
+                    a: -1, b: 3, c: 4, op: '>=',
+                    tex: "-x^2 + 3x + 4 \\ge 0",
+                    solutionSteps: [
+                        "1. 解方程 \(-x^2 + 3x + 4 = 0 \implies -(x-4)(x+1) = 0\)，截距為 \(x = -1\) 與 \(x = 4\)。",
+                        "2. <b>注意陷阱：</b>二次項係數 \(a = -1 < 0\)，拋物線<b>開口向下 (∩)</b>！",
+                        "3. 不等號為 \(\\ge\)，取 <b>x 軸上方 (含截距)</b> 的中間拱形曲線。",
+                        "4. 得出解集：<b>\\(-1 \\le x \\le 4\\)</b>"
+                    ],
+                    options: [
+                        { text: "\\(-1 \\le x \\le 4\\)", correct: true },
+                        { text: "\\(x \\le -1 \\text{ 或 } x \\ge 4\\)", correct: false },
+                        { text: "\\(-4 \\le x \\le 1\\)", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                }
+            ],
+            3: [
+                {
+                    a: 1, b: -6, c: 9, op: '>',
+                    tex: "x^2 - 6x + 9 > 0",
+                    solutionSteps: [
+                        "1. 判別式 \(\\Delta = (-6)^2 - 4(1)(9) = 0\)，拋物線與 x 軸<b>相切於一點 \(x = 3\)</b>。",
+                        "2. 係數 \(a = 1 > 0\)，開口向上，整個拋物線除了頂點 \((3, 0)\) 外，其餘全部在 x 軸上方。",
+                        "3. 不等號為嚴格 \(>\)（不含等於），因此只需剔除相切點 \(x = 3\)。",
+                        "4. 得出解集：<b>除了 \(x = 3\) 以外的所有實數 (\(x \\neq 3\\))</b>"
+                    ],
+                    options: [
+                        { text: "\\(x \\neq 3\\) 的所有實數", correct: true },
+                        { text: "所有實數", correct: false },
+                        { text: "\\(x > 3\\)", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: -6, c: 9, op: '<=',
+                    tex: "x^2 - 6x + 9 \\le 0",
+                    solutionSteps: [
+                        "1. 拋物線開口向上，且頂點觸碰 x 軸於 \(x = 3\)。",
+                        "2. 在 x 軸下方的曲線段不存在 (\(y < 0\))，但允許等於 0 (\(y = 0\))。",
+                        "3. 唯一的解就是頂點本身。解為：<b>\\(x = 3\\)</b>"
+                    ],
+                    options: [
+                        { text: "\\(x = 3\\)", correct: true },
+                        { text: "無解", correct: false },
+                        { text: "\\(x \\le 3\\)", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                }
+            ],
+            4: [
+                {
+                    a: 1, b: 2, c: 5, op: '>',
+                    tex: "x^2 + 2x + 5 > 0",
+                    solutionSteps: [
+                        "1. 計算判別式 \(\\Delta = 2^2 - 4(1)(5) = -16 < 0\)，代表與 x 軸<b>完全沒有交點</b>。",
+                        "2. 係數 \(a = 1 > 0\)，開口向上，整條拋物線<b>懸空浮在 x 軸上方</b>。",
+                        "3. 不等號要求 \(> 0\)（x 軸上方），整條拋物線全部符合！",
+                        "4. 得出解集：<b>所有實數</b>"
+                    ],
+                    options: [
+                        { text: "所有實數", correct: true },
+                        { text: "無解 (No Solution)", correct: false },
+                        { text: "\\(x > -2\\)", correct: false },
+                        { text: "\\(x < 5\\)", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 0, c: 4, op: '<',
+                    tex: "x^2 + 4 < 0",
+                    solutionSteps: [
+                        "1. \(\\Delta = -16 < 0\)，無交點；\(a = 1 > 0\)，完全浮在 x 軸上方。",
+                        "2. 不等號要求 \(< 0\)（x 軸下方），但 x 軸下方完全沒有任何圖像。",
+                        "3. 得出解集：<b>無解</b>"
+                    ],
+                    options: [
+                        { text: "無解", correct: true },
+                        { text: "所有實數", correct: false },
+                        { text: "\\(-2 < x < 2\\)", correct: false },
+                        { text: "\\(x < -2\\)", correct: false }
+                    ]
+                }
+            ],
+            5: [
+                {
+                    a: 1, b: -2, c: -8, op: '>',
+                    tex: "(x - 4)(x + 2) > 0",
+                    solutionSteps: [
+                        "1. 截距為 \(x = -2\) 與 \(x = 4\)。",
+                        "2. \(a = 1 > 0\) 開口向上，要求 \(> 0\) 取 x 軸上方。",
+                        "3. 兩端開口區域，最終解為：<b>\\(x < -2 \\text{ 或 } x > 4\\)</b>"
+                    ],
+                    options: [
+                        { text: "\\(x < -2 \\text{ 或 } x > 4\\)", correct: true },
+                        { text: "\\(-2 < x < 4\\)", correct: false },
+                        { text: "\\(x < 2 \\text{ 或 } x > -4\\)", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                }
+            ]
+        };
+
+        /* ==================== GLOBAL APP STATE ==================== */
+        let state = {
+            currentMode: 'explore',
+            score: 0,
+            streak: 0,
+            explore: { a: 1, b: -2, c: -3, op: '>' },
+            game: { level: 1, qIndex: 0 },
+            sandbox: { a: 1, b: -4, c: 3, op: '>' }
+        };
+
+        /* ==================== CANVAS HIGH-RES PARABOLA ENGINE ==================== */
+        function drawParabolaGraph(canvasId, a, b, c, op) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Clear Canvas
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, w, h);
+
+            // Origin Coordinate setup
+            const originX = w / 2;
+            const originY = h / 2 + 15;
+            const scaleX = 35; // 35px per unit
+            const scaleY = 15;
+
+            function toScreenX(x) { return originX + x * scaleX; }
+            function toScreenY(y) { return originY - y * scaleY; }
+
+            // Grid Lines
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let x = -10; x <= 10; x++) {
+                ctx.beginPath(); ctx.moveTo(toScreenX(x), 0); ctx.lineTo(toScreenX(x), h); ctx.stroke();
+            }
+            for (let y = -10; y <= 10; y++) {
+                ctx.beginPath(); ctx.moveTo(0, toScreenY(y)); ctx.lineTo(w, toScreenY(y)); ctx.stroke();
+            }
+
+            // X and Y Main Axes
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(w, originY); ctx.stroke(); // X-Axis
+            ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, h); ctx.stroke(); // Y-Axis
+
+            // Axis Label Arrows
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 11px Outfit, sans-serif';
+            ctx.fillText('x', w - 12, originY - 8);
+            ctx.fillText('y', originX + 8, 14);
+
+            // Tick Labels
+            ctx.textAlign = 'center';
+            for (let x = -6; x <= 6; x += 2) {
+                if (x !== 0) ctx.fillText(x.toString(), toScreenX(x), originY + 16);
+            }
+
+            // Math Parabola Curve
+            const f = (x) => a * x * x + b * x + c;
+            const delta = b * b - 4 * a * c;
+
+            // Draw Full Background Subtle Curve
+            ctx.beginPath();
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 3;
+            let started = false;
+            for (let px = 0; px <= w; px += 2) {
+                const x = (px - originX) / scaleX;
+                const y = f(x);
+                const py = toScreenY(y);
+                if (!started) { ctx.moveTo(px, py); started = true; }
+                else { ctx.lineTo(px, py); }
+            }
+            ctx.stroke();
+
+            // Highlight Curve Segments (Above x-axis: Cyan / Below x-axis: Pink)
+            const isGreater = op.includes('>');
+            const isIncludeEqual = op.includes('=');
+
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = isGreater ? '#06b6d4' : '#ec4899'; // Cyan for Above, Pink for Below
+
+            ctx.beginPath();
+            let active = false;
+            for (let px = 0; px <= w; px += 2) {
+                const x = (px - originX) / scaleX;
+                const y = f(x);
+                const py = toScreenY(y);
+                const matches = isGreater ? (y > 0) : (y < 0);
+
+                if (matches) {
+                    if (!active) { ctx.moveTo(px, py); active = true; }
+                    else { ctx.lineTo(px, py); }
+                } else {
+                    if (active) { ctx.stroke(); ctx.beginPath(); active = false; }
+                }
+            }
+            if (active) ctx.stroke();
+
+            // Highlight Solution Range on X-Axis
+            if (delta > 0 && a !== 0) {
+                const x1 = (-b - Math.sqrt(delta)) / (2 * a);
+                const x2 = (-b + Math.sqrt(delta)) / (2 * a);
+                const rootMin = Math.min(x1, x2);
+                const rootMax = Math.max(x1, x2);
+
+                const sxMin = toScreenX(rootMin);
+                const sxMax = toScreenX(rootMax);
+
+                ctx.lineWidth = 7;
+                ctx.strokeStyle = '#10b981'; // Emerald solution on X-axis
+
+                ctx.beginPath();
+                if ((a > 0 && isGreater) || (a < 0 && !isGreater)) {
+                    // Outer two tails
+                    ctx.moveTo(0, originY); ctx.lineTo(sxMin, originY); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(sxMax, originY); ctx.lineTo(w, originY); ctx.stroke();
+                } else {
+                    // Middle between roots
+                    ctx.moveTo(sxMin, originY); ctx.lineTo(sxMax, originY); ctx.stroke();
+                }
+
+                // Roots Dots (Hollow / Solid)
+                [sxMin, sxMax].forEach(sx => {
+                    ctx.beginPath();
+                    ctx.arc(sx, originY, 6, 0, Math.PI * 2);
+                    if (isIncludeEqual) {
+                        ctx.fillStyle = '#10b981'; ctx.fill();
+                    } else {
+                        ctx.fillStyle = '#090d16'; ctx.fill();
+                        ctx.strokeStyle = '#10b981'; ctx.lineWidth = 3; ctx.stroke();
+                    }
+                });
+            } else if (Math.abs(delta) < 1e-5 && a !== 0) {
+                const root = -b / (2 * a);
+                const sx = toScreenX(root);
+
+                if (a > 0 && isGreater && !isIncludeEqual) {
+                    // All except root
+                    ctx.lineWidth = 6; ctx.strokeStyle = '#10b981';
+                    ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(sx - 4, originY); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(sx + 4, originY); ctx.lineTo(w, originY); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(sx, originY, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#090d16'; ctx.fill(); ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5; ctx.stroke();
+                } else if ((a > 0 && isGreater && isIncludeEqual) || (a < 0 && !isGreater && isIncludeEqual)) {
+                    // All real numbers
+                    ctx.lineWidth = 7; ctx.strokeStyle = '#10b981';
+                    ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(w, originY); ctx.stroke();
+                }
+            } else if (delta < 0) {
+                const allPass = (a > 0 && isGreater) || (a < 0 && !isGreater);
+                if (allPass) {
+                    ctx.lineWidth = 7; ctx.strokeStyle = '#10b981';
+                    ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(w, originY); ctx.stroke();
+                }
+            }
+        }
+
+        /* ==================== MODULE 1 CONTROLLER ==================== */
+        function updateExploreGraph() {
+            const aVal = parseInt(document.getElementById('explore-slider-a').value);
+            state.explore.a = aVal === 0 ? 1 : aVal;
+            document.getElementById('explore-a-val').innerText = `a = ${state.explore.a} (${state.explore.a > 0 ? '開口向上 ∪' : '開口向下 ∩'})`;
+
+            const a = state.explore.a;
+            const b = -2;
+            const c = -3;
+            const op = state.explore.op;
+
+            drawParabolaGraph('explore-canvas', a, b, c, op);
+
+            const eqText = `${a === 1 ? '' : (a === -1 ? '-' : a)}x^2 - 2x - 3 ${op.replace('>=', '\\ge').replace('<=', '\\le')} 0`;
+            document.getElementById('explore-equation-text').innerHTML = `\\( ${eqText} \\)`;
+
+            let solText = "";
+            if (a > 0) {
+                if (op === '>') solText = "\\( x < -1 \\text{ 或 } x > 3 \\)";
+                else if (op === '>=') solText = "\\( x \\le -1 \\text{ 或 } x \\ge 3 \\)";
+                else if (op === '<') solText = "\\( -1 < x < 3 \\)";
+                else if (op === '<=') solText = "\\( -1 \\le x \\le 3 \\)";
+            } else {
+                if (op === '>') solText = "\\( -1 < x < 3 \\)";
+                else if (op === '>=') solText = "\\( -1 \\le x \\le 3 \\)";
+                else if (op === '<') solText = "\\( x < -1 \\text{ 或 } x > 3 \\)";
+                else if (op === '<=') solText = "\\( x \\le -1 \\text{ 或 } x \\ge 3 \\)";
+            }
+
+            document.getElementById('explore-solution-text').innerHTML = solText;
+
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "explore-equation-text"]);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "explore-solution-text"]);
+            }
+        }
+
+        function setExploreSign(sign) {
+            sfx.click();
+            state.explore.op = sign;
+            ['gt', 'gte', 'lt', 'lte'].forEach(s => {
+                const btn = document.getElementById(`exp-sign-${s}`);
+                btn.className = "py-2 rounded-xl border-2 border-slate-800 bg-slate-900 text-slate-400 font-black text-sm transition";
+            });
+            const keyMap = { '>': 'gt', '>=': 'gte', '<': 'lt', '<=': 'lte' };
+            const activeBtn = document.getElementById(`exp-sign-${keyMap[sign]}`);
+            activeBtn.className = "py-2 rounded-xl border-2 border-cyan-500 bg-cyan-950/60 text-cyan-300 font-black text-sm transition";
+
+            updateExploreGraph();
+        }
+
+        /* ==================== MODULE 2 GAME CONTROLLER ==================== */
+        function selectGameLevel(lvl) {
+            sfx.click();
+            state.game.level = lvl;
+            state.game.qIndex = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`game-lvl-btn-${i}`);
+                if (i === lvl) {
+                    btn.className = "p-3.5 rounded-2xl border-2 border-pink-500 bg-pink-950/40 text-left transition relative overflow-hidden shadow-lg shadow-pink-500/20";
+                } else {
+                    btn.className = "p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100";
+                }
+            }
+
+            loadGameQuestion();
+        }
+
+        function loadGameQuestion() {
+            const questions = GAME_LEVELS[state.game.level];
+            if (!questions || state.game.qIndex >= questions.length) state.game.qIndex = 0;
+
+            const q = questions[state.game.qIndex];
+
+            document.getElementById('game-question-badge').innerText = `關卡 ${state.game.level} - 第 ${state.game.qIndex + 1}/${questions.length} 題`;
+            document.getElementById('game-problem-tex').innerHTML = `\\( ${q.tex} \\)`;
+
+            const optionsContainer = document.getElementById('game-options-container');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "neon-card p-4 rounded-2xl text-left font-bold text-sm text-slate-200 hover:text-white flex items-center gap-3 transition cursor-pointer";
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-pink-400 font-mono font-black">${String.fromCharCode(65 + idx)}</span>
+                    <span class="text-sm font-black">${opt.text}</span>
+                `;
+                btn.onclick = () => checkGameAnswer(opt.correct, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('game-solution-card').classList.add('hidden');
+            drawParabolaGraph('game-canvas', q.a, q.b, q.c, q.op);
+
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "game-problem-tex"]);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, optionsContainer]);
+            }
+        }
+
+        function checkGameAnswer(isCorrect, clickedBtn) {
+            const q = GAME_LEVELS[state.game.level][state.game.qIndex];
+            const buttons = document.getElementById('game-options-container').querySelectorAll('button');
+
+            buttons.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                sfx.correct();
+                clickedBtn.className = "p-4 rounded-2xl text-left font-bold text-sm bg-emerald-950/80 border-2 border-emerald-500 text-emerald-200 flex items-center gap-3 shadow-lg shadow-emerald-500/20";
+
+                state.score += 100 + (state.streak * 25);
+                state.streak += 1;
+
+                // Confetti particle celebration effect
+                try {
+                    confetti({
+                        particleCount: 70,
+                        spread: 60,
+                        origin: { y: 0.7 }
+                    });
+                } catch(e) {}
+            } else {
+                sfx.wrong();
+                clickedBtn.className = "p-4 rounded-2xl text-left font-bold text-sm bg-rose-950/80 border-2 border-rose-500 text-rose-200 flex items-center gap-3 shadow-lg shadow-rose-500/20";
+                state.streak = 0;
+            }
+
+            document.getElementById('score-counter').innerText = state.score;
+            document.getElementById('streak-counter').innerText = state.streak;
+
+            const solCard = document.getElementById('game-solution-card');
+            const solText = document.getElementById('game-solution-text');
+            solText.innerHTML = q.solutionSteps.join('<br>');
+
+            solCard.classList.remove('hidden');
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, solText]);
+            }
+        }
+
+        function nextGameQuestion() {
+            sfx.click();
+            const questions = GAME_LEVELS[state.game.level];
+            state.game.qIndex++;
+            if (state.game.qIndex >= questions.length) {
+                if (state.game.level < 5) selectGameLevel(state.game.level + 1);
+                else { state.game.qIndex = 0; loadGameQuestion(); }
+            } else {
+                loadGameQuestion();
+            }
+        }
+
+        /* ==================== MODULE 3 CONTROLLER ==================== */
+        function loadSandboxPreset(a, b, c, op) {
+            sfx.click();
+            document.getElementById('sb-input-a').value = a;
+            document.getElementById('sb-input-b').value = b;
+            document.getElementById('sb-input-c').value = c;
+            document.getElementById('sb-select-op').value = op;
+            updateSandboxGraph();
+        }
+
+        function updateSandboxGraph() {
+            const a = parseFloat(document.getElementById('sb-input-a').value) || 1;
+            const b = parseFloat(document.getElementById('sb-input-b').value) || 0;
+            const c = parseFloat(document.getElementById('sb-input-c').value) || 0;
+            const op = document.getElementById('sb-select-op').value;
+
+            drawParabolaGraph('sandbox-canvas', a, b, c, op);
+
+            const stepsOut = document.getElementById('sb-steps-output');
+            const delta = b * b - 4 * a * c;
+
+            let html = `<div>1. 目標不等式：\\(${a}x^2 ${b>=0?'+':''}${b}x ${c>=0?'+':''}${c} ${op.replace('>=','\\ge').replace('<=','\\le')} 0\\)</div>`;
+            html += `<div>2. 判別式 Delta：\\(\\Delta = (${b})^2 - 4(${a})(${c}) = ${delta}\\)</div>`;
+            html += `<div>3. 開口方向：\\(a = ${a} ${a>0 ? '> 0\\text{ (開口向上 ∪)}' : '< 0\\text{ (開口向下 ∩)}'}\\)</div>`;
+
+            if (delta > 0) {
+                const x1 = (-b - Math.sqrt(delta)) / (2 * a);
+                const x2 = (-b + Math.sqrt(delta)) / (2 * a);
+                const r1 = Math.min(x1, x2).toFixed(2);
+                const r2 = Math.max(x1, x2).toFixed(2);
+                html += `<div>4. x 軸交點：\\(x_1 = ${r1}, x_2 = ${r2}\\)</div>`;
+            } else if (delta === 0) {
+                const r = (-b / (2 * a)).toFixed(2);
+                html += `<div>4. 相切於一點：\\(x = ${r}\\)</div>`;
+            } else {
+                html += `<div>4. 與 x 軸無任何交點。</div>`;
+            }
+
+            stepsOut.innerHTML = html;
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, stepsOut]);
+            }
+        }
+
+        /* ==================== GLOBAL MODE NAVIGATION ==================== */
+        function switchMode(mode) {
+            sfx.click();
+            state.currentMode = mode;
+
+            document.getElementById('view-explore').classList.add('hidden');
+            document.getElementById('view-game').classList.add('hidden');
+            document.getElementById('view-sandbox').classList.add('hidden');
+
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.className = "nav-tab px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap";
+            });
+
+            const activeTab = document.getElementById(`tab-${mode}`);
+            activeTab.className = "nav-tab px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/30 whitespace-nowrap";
+
+            document.getElementById(`view-${mode}`).classList.remove('hidden');
+
+            if (mode === 'explore') updateExploreGraph();
+            if (mode === 'game') selectGameLevel(state.game.level);
+            if (mode === 'sandbox') updateSandboxGraph();
+        }
+
+        window.onload = function () {
+            updateExploreGraph();
+
+            document.getElementById('sound-toggle-btn').addEventListener('click', () => {
+                sfx.enabled = !sfx.enabled;
+                const icon = document.getElementById('sound-icon');
+                icon.className = sfx.enabled ? "fa-solid fa-volume-high text-lg text-pink-400" : "fa-solid fa-volume-xmark text-lg text-slate-500";
+            });
+        };
+    </script>
+</body>
+</html>
