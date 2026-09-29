@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港中五數學科：圖解一元二次不等式</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans HK', 'Outfit', 'sans-serif'],
+                        mono: ['Outfit', 'monospace']
+                    },
+                    colors: {
+                        cyber: {
+                            bg: '#090d16',
+                            card: '#0f172a',
+                            pink: '#ec4899',
+                            cyan: '#06b6d4',
+                            purple: '#8b5cf6',
+                            yellow: '#f59e0b',
+                            green: '#10b981'
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s infinite alternate',
+                        'bounce-subtle': 'bounceSubtle 1.5s infinite'
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { boxShadow: '0 0 15px rgba(236, 72, 153, 0.3)' },
+                            '100%': { boxShadow: '0 0 30px rgba(6, 182, 212, 0.6)' }
+                        },
+                        bounceSubtle: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans HK', sans-serif;
+            background-color: #090d16;
+            color: #f8fafc;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.18) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.12) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .option-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.25s ease;
+        }
+
+        .option-card:hover {
+            border-color: rgba(236, 72, 153, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -5px rgba(236, 72, 153, 0.3);
+        }
+
+        /* Pure CSS Math Formula Display */
+        .math-expr {
+            font-family: 'Outfit', 'Noto Sans HK', sans-serif;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+        .math-expr sup {
+            font-size: 0.65em;
+            vertical-align: super;
+            line-height: 0;
+        }
+
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 border-b border-pink-500/20 bg-slate-950/85 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-0.5 shadow-lg animate-pulse-glow flex items-center justify-center">
+                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                        <i class="fa-solid fa-chart-line text-2xl text-cyan-400"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-black text-lg sm:text-2xl tracking-tight bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-300 bg-clip-text text-transparent flex items-center gap-2">
+                        圖解一元二次不等式 <span class="text-xs px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/40 font-bold hidden sm:inline-block">HKDSE 中五數學科</span>
+                    </h1>
+                    <p class="text-xs font-semibold text-slate-400">專為中五文憑試學生設計的互動學習遊戲</p>
+                </div>
+            </div>
+
+            <!-- Gamified Stats Header -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <div class="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-xl">
+                    <i class="fa-solid fa-fire text-amber-400 text-lg animate-bounce-subtle"></i>
+                    <div>
+                        <div class="text-[9px] uppercase font-bold text-amber-300/80 leading-none">Combo 連勝</div>
+                        <span id="streak-counter" class="text-sm sm:text-base font-black text-amber-300 font-mono">0</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/30 px-3 py-1.5 rounded-xl">
+                    <i class="fa-solid fa-trophy text-yellow-400 text-lg"></i>
+                    <div>
+                        <div class="text-[9px] uppercase font-bold text-cyan-300/80 leading-none">累積得分</div>
+                        <span id="score-counter" class="text-sm sm:text-base font-black text-cyan-300 font-mono">0</span>
+                    </div>
+                </div>
+
+                <button id="sound-toggle-btn" class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:border-pink-500 transition">
+                    <i class="fa-solid fa-volume-high text-lg text-pink-400" id="sound-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Interactive App Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
+
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-3 border-b border-slate-800 pb-2 overflow-x-auto scrollbar-none">
+            <button onclick="switchTab('explore')" id="tab-btn-explore" class="px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/30 whitespace-nowrap">
+                <i class="fa-solid fa-book-open text-cyan-300"></i> 【一】概念講義與全景對照表
+            </button>
+            <button onclick="switchTab('game')" id="tab-btn-game" class="px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                <i class="fa-solid fa-gamepad text-pink-400"></i> 【二】DSE 關卡大挑戰 (40題)
+            </button>
+            <button onclick="switchTab('sandbox')" id="tab-btn-sandbox" class="px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                <i class="fa-solid fa-flask text-emerald-400"></i> 【三】拋物線繪圖實驗室 Sandbox
+            </button>
+        </div>
+
+        <!-- ==================== MODULE 1: CONCEPT LECTURE & FULL TABLE ==================== -->
+        <div id="view-explore" class="space-y-6">
+            <!-- Dynamic Graph Visualizer -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Visualizer Controls & Steps -->
+                <div class="lg:col-span-5 glass-panel p-6 rounded-3xl space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> 圖解解題 4 大步驟
+                        </h2>
+                        <span class="text-xs bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded-full font-bold">DSE 必備技能</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="p-3 rounded-2xl bg-slate-900/80 border border-cyan-500/30 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                            <div class="text-xs">
+                                <strong class="text-cyan-200 block font-bold text-sm">求 x 軸截距 (X-intercepts)</strong>
+                                解方程 ax² + bx + c = 0，求出根 α 及 β。
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-2xl bg-slate-900/80 border border-purple-500/30 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-lg bg-purple-500/20 text-purple-300 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                            <div class="text-xs">
+                                <strong class="text-purple-200 block font-bold text-sm">判斷拋物線開口方向</strong>
+                                若 a > 0 開口向上 (∪)；若 a < 0 開口向下 (∩)。
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-2xl bg-slate-900/80 border border-pink-500/30 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-lg bg-pink-500/20 text-pink-300 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                            <div class="text-xs">
+                                <strong class="text-pink-200 block font-bold text-sm">比對不等號區域</strong>
+                                > 或 ≥ 取 x 軸上方圖像（青藍色）；< 或 ≤ 取 x 軸下方圖像（霓虹粉）。
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-2xl bg-slate-900/80 border border-amber-500/30 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-300 font-black text-xs flex items-center justify-center shrink-0 mt-0.5">4</span>
+                            <div class="text-xs">
+                                <strong class="text-amber-200 block font-bold text-sm">讀取 x 軸投影範圍（最終解）</strong>
+                                不含等於畫「空心點」；包含等於畫「實心點」。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Controls -->
+                    <div class="pt-3 border-t border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <span class="text-slate-300">開口方向 (係數 a)：</span>
+                            <span id="exp-a-text" class="text-cyan-400 font-mono">a = +1 (開口向上 ∪)</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setExploreA(1)" id="btn-exp-a-pos" class="py-2 rounded-xl bg-cyan-950 border-2 border-cyan-500 text-cyan-300 font-bold text-xs">開口向上 (a > 0)</button>
+                            <button onclick="setExploreA(-1)" id="btn-exp-a-neg" class="py-2 rounded-xl bg-slate-900 border-2 border-slate-800 text-slate-400 font-bold text-xs">開口向下 (a < 0)</button>
+                        </div>
+
+                        <div class="text-xs font-bold text-slate-300">選擇不等號：</div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="setExploreOp('>')" id="exp-op-gt" class="py-2 rounded-xl border-2 border-pink-500 bg-pink-950/60 text-pink-300 font-black text-sm">&gt;</button>
+                            <button onclick="setExploreOp('>=')" id="exp-op-gte" class="py-2 rounded-xl border-2 border-slate-800 bg-slate-900 text-slate-400 font-black text-sm">&ge;</button>
+                            <button onclick="setExploreOp('<')" id="exp-op-lt" class="py-2 rounded-xl border-2 border-slate-800 bg-slate-900 text-slate-400 font-black text-sm">&lt;</button>
+                            <button onclick="setExploreOp('<=')" id="exp-op-lte" class="py-2 rounded-xl border-2 border-slate-800 bg-slate-900 text-slate-400 font-black text-sm">&le;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Visualizer Display -->
+                <div class="lg:col-span-7 glass-panel p-6 rounded-3xl flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-chart-area text-cyan-400"></i> 即時拋物線草圖與 x 軸投影解
+                            </h3>
+                            <div class="flex items-center gap-3 text-xs font-bold">
+                                <span class="text-cyan-300 flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span> y > 0 (上方)</span>
+                                <span class="text-pink-400 flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-pink-500 inline-block"></span> y < 0 (下方)</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 rounded-2xl p-3 border-2 border-slate-800 shadow-inner">
+                            <canvas id="explore-canvas" width="600" height="300" class="w-full rounded-xl bg-slate-950"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-purple-950/40 to-slate-900 border border-purple-500/30">
+                        <div class="text-xs font-bold text-slate-400">當前不等式與最終解集：</div>
+                        <div id="exp-math-display" class="text-xl font-black text-cyan-300 math-expr mt-1">
+                            x² - 2x - 3 &gt; 0
+                        </div>
+                        <div id="exp-sol-display" class="text-base sm:text-lg font-black text-emerald-400 font-mono mt-2 pt-2 border-t border-slate-800">
+                            解集：x &lt; -1 或 x &gt; 3
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Panoramic Reference Table -->
+            <div class="glass-panel p-6 rounded-3xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h2 class="text-lg font-black text-amber-300 flex items-center gap-2">
+                        <i class="fa-solid fa-table-cells text-amber-400"></i> DSE 圖解法與判別式 (Δ) 全景對照總表
+                    </h2>
+                    <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full font-bold">應試必背秘笈</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900/90 text-slate-300 border-b border-slate-800">
+                                <th class="p-3 border-r border-slate-800 min-w-[120px]">判別式 Δ 類型</th>
+                                <th class="p-3 border-r border-slate-800 min-w-[140px]">開口方向</th>
+                                <th class="p-3 border-r border-slate-800 min-w-[140px] text-pink-300 font-black">ax² + bx + c &gt; 0</th>
+                                <th class="p-3 border-r border-slate-800 min-w-[140px] text-pink-300 font-black">ax² + bx + c &ge; 0</th>
+                                <th class="p-3 border-r border-slate-800 min-w-[140px] text-cyan-300 font-black">ax² + bx + c &lt; 0</th>
+                                <th class="p-3 min-w-[140px] text-cyan-300 font-black">ax² + bx + c &le; 0</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 font-mono">
+                            <!-- Δ > 0 -->
+                            <tr class="hover:bg-slate-900/40">
+                                <td class="p-3 border-r border-slate-800 font-bold text-amber-300" rowspan="2">
+                                    兩相異實根<br><span class="text-[10px] text-slate-400">(Δ &gt; 0, 交於 α, β)</span>
+                                </td>
+                                <td class="p-3 border-r border-slate-800 text-cyan-300 font-bold">a &gt; 0 (開口向上 ∪)</td>
+                                <td class="p-3 border-r border-slate-800">x &lt; α 或 x &gt; β</td>
+                                <td class="p-3 border-r border-slate-800">x &le; α 或 x &ge; β</td>
+                                <td class="p-3 border-r border-slate-800">α &lt; x &lt; β</td>
+                                <td class="p-3">α &le; x &le; β</td>
+                            </tr>
+                            <tr class="hover:bg-slate-900/40 bg-slate-950/30">
+                                <td class="p-3 border-r border-slate-800 text-purple-300 font-bold">a &lt; 0 (開口向下 ∩)</td>
+                                <td class="p-3 border-r border-slate-800">α &lt; x &lt; β</td>
+                                <td class="p-3 border-r border-slate-800">α &le; x &le; β</td>
+                                <td class="p-3 border-r border-slate-800">x &lt; α 或 x &gt; β</td>
+                                <td class="p-3">x &le; α 或 x &ge; β</td>
+                            </tr>
+
+                            <!-- Δ = 0 -->
+                            <tr class="hover:bg-slate-900/40 border-t-2 border-slate-800">
+                                <td class="p-3 border-r border-slate-800 font-bold text-purple-300" rowspan="2">
+                                    相切重根特例<br><span class="text-[10px] text-slate-400">(Δ = 0, 切於 k)</span>
+                                </td>
+                                <td class="p-3 border-r border-slate-800 text-cyan-300 font-bold">a &gt; 0 (開口向上 ∪)</td>
+                                <td class="p-3 border-r border-slate-800 text-amber-200">x &ne; k 的所有實數</td>
+                                <td class="p-3 border-r border-slate-800 text-emerald-400 font-bold">所有實數</td>
+                                <td class="p-3 border-r border-slate-800 text-rose-400 font-bold">無解</td>
+                                <td class="p-3 text-amber-200">只有 x = k</td>
+                            </tr>
+                            <tr class="hover:bg-slate-900/40 bg-slate-950/30">
+                                <td class="p-3 border-r border-slate-800 text-purple-300 font-bold">a &lt; 0 (開口向下 ∩)</td>
+                                <td class="p-3 border-r border-slate-800 text-rose-400 font-bold">無解</td>
+                                <td class="p-3 border-r border-slate-800 text-amber-200">只有 x = k</td>
+                                <td class="p-3 border-r border-slate-800 text-amber-200">x &ne; k 的所有實數</td>
+                                <td class="p-3 text-emerald-400 font-bold">所有實數</td>
+                            </tr>
+
+                            <!-- Δ < 0 -->
+                            <tr class="hover:bg-slate-900/40 border-t-2 border-slate-800">
+                                <td class="p-3 border-r border-slate-800 font-bold text-emerald-400" rowspan="2">
+                                    懸空特例<br><span class="text-[10px] text-slate-400">(Δ &lt; 0, 無交點)</span>
+                                </td>
+                                <td class="p-3 border-r border-slate-800 text-cyan-300 font-bold">a &gt; 0 (開口向上 ∪)</td>
+                                <td class="p-3 border-r border-slate-800 text-emerald-400 font-bold">所有實數</td>
+                                <td class="p-3 border-r border-slate-800 text-emerald-400 font-bold">所有實數</td>
+                                <td class="p-3 border-r border-slate-800 text-rose-400 font-bold">無解</td>
+                                <td class="p-3 text-rose-400 font-bold">無解</td>
+                            </tr>
+                            <tr class="hover:bg-slate-900/40 bg-slate-950/30">
+                                <td class="p-3 border-r border-slate-800 text-purple-300 font-bold">a &lt; 0 (開口向下 ∩)</td>
+                                <td class="p-3 border-r border-slate-800 text-rose-400 font-bold">無解</td>
+                                <td class="p-3 border-r border-slate-800 text-rose-400 font-bold">無解</td>
+                                <td class="p-3 border-r border-slate-800 text-emerald-400 font-bold">所有實數</td>
+                                <td class="p-3 text-emerald-400 font-bold">所有實數</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODULE 2: DSE GAME CHALLENGE ==================== -->
+        <div id="view-game" class="hidden space-y-6">
+            <!-- Level Selector Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <button onclick="selectLevel(1)" id="lvl-btn-1" class="p-3 rounded-2xl border-2 border-pink-500 bg-pink-950/40 text-left transition shadow-lg shadow-pink-500/20">
+                    <div class="text-[10px] text-pink-400 font-black uppercase">第一關 (8題)</div>
+                    <div class="font-black text-white text-xs sm:text-sm">標準開口向上</div>
+                    <div class="text-[10px] text-slate-400 font-bold">a &gt; 0, Δ &gt; 0</div>
+                </button>
+                <button onclick="selectLevel(2)" id="lvl-btn-2" class="p-3 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100">
+                    <div class="text-[10px] text-purple-400 font-black uppercase">第二關 (8題)</div>
+                    <div class="font-black text-white text-xs sm:text-sm">開口向下陷阱</div>
+                    <div class="text-[10px] text-slate-400 font-bold">a &lt; 0, Δ &gt; 0</div>
+                </button>
+                <button onclick="selectLevel(3)" id="lvl-btn-3" class="p-3 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100">
+                    <div class="text-[10px] text-cyan-400 font-black uppercase">第三關 (8題)</div>
+                    <div class="font-black text-white text-xs sm:text-sm">二重根特例</div>
+                    <div class="text-[10px] text-slate-400 font-bold">Δ = 0</div>
+                </button>
+                <button onclick="selectLevel(4)" id="lvl-btn-4" class="p-3 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100">
+                    <div class="text-[10px] text-emerald-400 font-black uppercase">第四關 (8題)</div>
+                    <div class="font-black text-white text-xs sm:text-sm">懸空特例</div>
+                    <div class="text-[10px] text-slate-400 font-bold">Δ &lt; 0</div>
+                </button>
+                <button onclick="selectLevel(5)" id="lvl-btn-5" class="p-3 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100 col-span-2 sm:col-span-1">
+                    <div class="text-[10px] text-amber-400 font-black uppercase">第五關 (8題)</div>
+                    <div class="font-black text-amber-300 text-xs sm:text-sm">DSE 歷屆未知數 k</div>
+                    <div class="text-[10px] text-slate-400 font-bold">Paper 2 選擇題</div>
+                </button>
+            </div>
+
+            <!-- Quiz Display Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Question Box -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="glass-panel p-6 rounded-3xl space-y-5 shadow-2xl relative">
+                        <div class="flex justify-between items-center">
+                            <span id="game-q-badge" class="px-3 py-1 rounded-full text-xs font-black bg-pink-500/20 text-pink-300 border border-pink-500/40">
+                                第一關 - 第 1 / 8 題
+                            </span>
+                            <span class="text-xs font-bold text-cyan-300 flex items-center gap-1">
+                                <i class="fa-solid fa-lightbulb"></i> 請運用圖解法選擇正確解答
+                            </span>
+                        </div>
+
+                        <!-- Mathematical Problem Display -->
+                        <div class="py-6 px-4 bg-slate-950/90 rounded-2xl border-2 border-slate-800 text-center space-y-2">
+                            <div class="text-xs font-bold text-slate-400">求解下列一元二次不等式：</div>
+                            <div id="game-problem-display" class="text-2xl sm:text-3xl font-black text-white math-expr min-h-[50px] flex items-center justify-center">
+                                x² - 5x + 6 &gt; 0
+                            </div>
+                        </div>
+
+                        <!-- MCQ Options -->
+                        <div id="game-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Solution Explanation Card -->
+                    <div id="game-solution-card" class="hidden glass-panel p-6 rounded-3xl border-2 border-emerald-500/40 bg-emerald-950/20 space-y-3">
+                        <div class="flex items-center gap-2 text-emerald-400 font-black text-base">
+                            <i class="fa-solid fa-circle-check text-xl"></i>
+                            <span>DSE 圖解法步驟拆解：</span>
+                        </div>
+                        <div id="game-solution-text" class="text-xs sm:text-sm text-slate-200 space-y-1.5 leading-relaxed font-mono">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                        <button onclick="nextQuestion()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 font-black rounded-2xl text-white text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 transition">
+                            <span>繼續下一題</span> <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Graph Preview for Current Quiz -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="glass-panel p-5 rounded-3xl space-y-3">
+                        <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-pencil text-pink-400"></i> 本題對應拋物線草圖
+                        </h3>
+                        <div class="bg-slate-950 rounded-2xl p-2.5 border-2 border-slate-800">
+                            <canvas id="game-canvas" width="450" height="260" class="w-full rounded-xl bg-slate-950"></canvas>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                            <strong class="text-pink-300 block mb-1 font-bold">💡 答題口訣：</strong>
+                            求截距 → 看開口 (∪/∩) → 不等號看 x 軸上方/下方！
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODULE 3: SANDBOX ==================== -->
+        <div id="view-sandbox" class="hidden space-y-6">
+            <div class="glass-panel p-6 rounded-3xl space-y-6">
+                <div>
+                    <h2 class="text-lg font-black text-white flex items-center gap-2">
+                        <i class="fa-solid fa-flask text-emerald-400"></i> 拋物線繪圖實驗室
+                    </h2>
+                    <p class="text-xs font-semibold text-slate-400 mt-1">自由輸入二次項係數 a, b, c，系統即時計算判別式 Δ、頂點，並在地圖畫布上繪製圖像與 x 軸解集。</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Controls Column -->
+                    <div class="lg:col-span-5 space-y-4 bg-slate-900/80 p-5 rounded-2xl border border-slate-800">
+                        <div class="text-xs font-black text-cyan-300 uppercase">1. 輸入二次不等式參數： ax² + bx + c</div>
+
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-300 mb-1">係數 a</label>
+                                <input type="number" id="sb-input-a" value="1" step="1" oninput="updateSandbox()" class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-2.5 text-sm text-cyan-300 font-mono font-black focus:border-pink-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-300 mb-1">係數 b</label>
+                                <input type="number" id="sb-input-b" value="-4" step="1" oninput="updateSandbox()" class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-2.5 text-sm text-cyan-300 font-mono font-black focus:border-pink-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-300 mb-1">常數 c</label>
+                                <input type="number" id="sb-input-c" value="3" step="1" oninput="updateSandbox()" class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-2.5 text-sm text-cyan-300 font-mono font-black focus:border-pink-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-300 mb-1">2. 選擇不等號類型</label>
+                            <select id="sb-select-op" onchange="updateSandbox()" class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-2.5 text-xs text-white font-bold focus:border-pink-500 outline-none">
+                                <option value=">">&gt; (大於 - 取 x 軸上方)</option>
+                                <option value=">=">&ge; (大於等於 - 含邊界交點)</option>
+                                <option value="<">&lt; (小於 - 取 x 軸下方)</option>
+                                <option value="<=">&le; (小於等於 - 含邊界交點)</option>
+                            </select>
+                        </div>
+
+                        <!-- Presets -->
+                        <div class="space-y-2 border-t border-slate-800 pt-3">
+                            <label class="block text-[11px] font-bold text-slate-400">載入常見考題預設：</label>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <button onclick="setSandboxPreset(1, -2, -3, '>')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 font-mono font-bold text-left border border-slate-700">x² - 2x - 3 &gt; 0</button>
+                                <button onclick="setSandboxPreset(-1, 2, 3, '>=')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 font-mono font-bold text-left border border-slate-700">-x² + 2x + 3 &ge; 0</button>
+                                <button onclick="setSandboxPreset(1, -6, 9, '>')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 font-mono font-bold text-left border border-slate-700">x² - 6x + 9 &gt; 0 (Δ=0)</button>
+                                <button onclick="setSandboxPreset(1, 0, 4, '<')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-slate-200 font-mono font-bold text-left border border-slate-700">x² + 4 &lt; 0 (無解)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Canvas Output -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="bg-slate-950 rounded-2xl p-3 border-2 border-slate-800">
+                            <canvas id="sandbox-canvas" width="550" height="280" class="w-full rounded-xl bg-slate-950"></canvas>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5 text-xs font-mono">
+                            <div class="font-extrabold text-emerald-400 text-sm flex items-center gap-1.5 mb-1">
+                                <i class="fa-solid fa-calculator"></i> 分析結果與 DSE 標準答題格式：
+                            </div>
+                            <div id="sb-analysis-output" class="text-slate-200 space-y-1">
+                                <!-- Injected by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950/80 py-4 text-center text-xs font-semibold text-slate-500">
+        香港中五數學科（必修部分）圖解一元二次不等式 Web App &copy; 2026 STEM Math Lab.
+    </footer>
+
+    <script>
+        /* ==================== WEB AUDIO API SYNTHESIZER ==================== */
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playTone(freq, duration, type = 'sine') {
+                if (!this.enabled) return;
+                this.init();
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+            correct() {
+                if (!this.enabled) return;
+                this.playTone(523.25, 0.08);
+                setTimeout(() => this.playTone(659.25, 0.1), 80);
+                setTimeout(() => this.playTone(783.99, 0.2), 160);
+            }
+            wrong() {
+                if (!this.enabled) return;
+                this.playTone(220, 0.12, 'sawtooth');
+                setTimeout(() => this.playTone(185, 0.2, 'sawtooth'), 120);
+            }
+            click() {
+                if (!this.enabled) return;
+                this.playTone(800, 0.03, 'sine');
+            }
+        }
+        const sfx = new SoundFX();
+
+        /* ==================== GLOBAL QUESTION DATABASE (40 QUESTIONS) ==================== */
+        const GAME_DATABASE = {
+            // Level 1: a > 0, Delta > 0
+            1: [
+                {
+                    a: 1, b: -5, c: 6, op: '>',
+                    exprHtml: "x<sup>2</sup> - 5x + 6 &gt; 0",
+                    steps: [
+                        "1. 解方程 x² - 5x + 6 = 0 ⇒ (x - 2)(x - 3) = 0，得交點 x = 2 及 x = 3。",
+                        "2. 因 a = 1 > 0，拋物線開口向上 (∪)。",
+                        "3. 不等號為 > (不含等於)，取 x 軸上方兩端圖像 (畫空心點)。",
+                        "4. 最終解：x &lt; 2 或 x &gt; 3"
+                    ],
+                    options: [
+                        { text: "x < 2 或 x > 3", correct: true },
+                        { text: "2 < x < 3", correct: false },
+                        { text: "x ≤ 2 或 x ≥ 3", correct: false },
+                        { text: "-3 < x < -2", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 0, c: -4, op: '<=',
+                    exprHtml: "x<sup>2</sup> - 4 &le; 0",
+                    steps: [
+                        "1. 解方程 x² - 4 = 0 ⇒ (x - 2)(x + 2) = 0，得交點 x = -2 及 x = 2。",
+                        "2. 因 a = 1 > 0，拋物线開口向上 (∪)。",
+                        "3. 不等號為 ≤ (含等於)，取 x 軸下方中間 U 型段 (畫實心點)。",
+                        "4. 最終解：-2 &le; x &le; 2"
+                    ],
+                    options: [
+                        { text: "-2 ≤ x ≤ 2", correct: true },
+                        { text: "x ≤ -2 或 x ≥ 2", correct: false },
+                        { text: "-2 < x < 2", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: -1, c: -6, op: '<',
+                    exprHtml: "x<sup>2</sup> - x - 6 &lt; 0",
+                    steps: [
+                        "1. 因式分解 (x - 3)(x + 2) = 0，得交點 x = -2 與 x = 3。",
+                        "2. a = 1 > 0 開口向上，要求 < 0 取 x 軸下方區域。",
+                        "3. 最終解：-2 &lt; x &lt; 3"
+                    ],
+                    options: [
+                        { text: "-2 < x < 3", correct: true },
+                        { text: "x < -2 或 x > 3", correct: false },
+                        { text: "-3 < x < 2", correct: false },
+                        { text: "x < -3 或 x > 2", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: -7, c: 10, op: '>=',
+                    exprHtml: "x<sup>2</sup> - 7x + 10 &ge; 0",
+                    steps: [
+                        "1. 解方程 (x - 2)(x - 5) = 0，交點為 x = 2 及 x = 5。",
+                        "2. a = 1 > 0 開口向上，要求 ≥ 0 取 x 軸上方兩端 (含交點)。",
+                        "3. 最終解：x &le; 2 或 x &ge; 5"
+                    ],
+                    options: [
+                        { text: "x ≤ 2 或 x ≥ 5", correct: true },
+                        { text: "2 ≤ x ≤ 5", correct: false },
+                        { text: "x < 2 或 x > 5", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                },
+                {
+                    a: 2, b: -5, c: 2, op: '>',
+                    exprHtml: "2x<sup>2</sup> - 5x + 2 &gt; 0",
+                    steps: [
+                        "1. 解方程 (2x - 1)(x - 2) = 0，得交點 x = 0.5 與 x = 2。",
+                        "2. a = 2 > 0 開口向上，要求 > 0 取兩端圖像。",
+                        "3. 最終解：x &lt; 0.5 或 x &gt; 2"
+                    ],
+                    options: [
+                        { text: "x < 0.5 或 x > 2", correct: true },
+                        { text: "0.5 < x < 2", correct: false },
+                        { text: "x < -2 或 x > -0.5", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 2, c: -8, op: '<=',
+                    exprHtml: "x<sup>2</sup> + 2x - 8 &le; 0",
+                    steps: [
+                        "1. (x + 4)(x - 2) = 0，交點 x = -4 及 x = 2。",
+                        "2. a = 1 > 0 開口向上，≤ 0 取中間段。",
+                        "3. 最終解：-4 &le; x &le; 2"
+                    ],
+                    options: [
+                        { text: "-4 ≤ x ≤ 2", correct: true },
+                        { text: "x ≤ -4 或 x ≥ 2", correct: false },
+                        { text: "-2 ≤ x ≤ 4", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: -4, c: 0, op: '>',
+                    exprHtml: "x<sup>2</sup> - 4x &gt; 0",
+                    steps: [
+                        "1. x(x - 4) = 0，交點 x = 0 與 x = 4。",
+                        "2. a = 1 > 0 開口向上，> 0 取兩端。",
+                        "3. 最終解：x &lt; 0 或 x &gt; 4"
+                    ],
+                    options: [
+                        { text: "x < 0 或 x > 4", correct: true },
+                        { text: "0 < x < 4", correct: false },
+                        { text: "x < -4 或 x > 0", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                },
+                {
+                    a: 3, b: -10, c: 3, op: '<',
+                    exprHtml: "3x<sup>2</sup> - 10x + 3 &lt; 0",
+                    steps: [
+                        "1. (3x - 1)(x - 3) = 0，交點 x = 1/3 及 x = 3。",
+                        "2. a = 3 > 0 開口向上，< 0 取中間段。",
+                        "3. 最終解：1/3 &lt; x &lt; 3"
+                    ],
+                    options: [
+                        { text: "1/3 < x < 3", correct: true },
+                        { text: "x < 1/3 或 x > 3", correct: false },
+                        { text: "-3 < x < -1/3", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                }
+            ],
+
+            // Level 2: a < 0, Delta > 0
+            2: [
+                {
+                    a: -1, b: 3, c: 4, op: '>=',
+                    exprHtml: "-x<sup>2</sup> + 3x + 4 &ge; 0",
+                    steps: [
+                        "1. 解方程 -x² + 3x + 4 = 0 ⇒ -(x - 4)(x + 1) = 0，得交點 x = -1 與 x = 4。",
+                        "2. 【注意陷阱】二次項係數 a = -1 < 0，拋物線開口向下 (∩)！",
+                        "3. 要求 ≥ 0，取 x 軸上方中間拱形區域 (含邊界)。",
+                        "4. 最終解：-1 &le; x &le; 4"
+                    ],
+                    options: [
+                        { text: "-1 ≤ x ≤ 4", correct: true },
+                        { text: "x ≤ -1 或 x ≥ 4", correct: false },
+                        { text: "-4 ≤ x ≤ 1", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: 2, c: 3, op: '>',
+                    exprHtml: "-x<sup>2</sup> + 2x + 3 &gt; 0",
+                    steps: [
+                        "1. -(x - 3)(x + 1) = 0，交點 x = -1 及 x = 3。",
+                        "2. a = -1 < 0 開口向下，> 0 取 x 軸上方中間拱形。",
+                        "3. 最終解：-1 &lt; x &lt; 3"
+                    ],
+                    options: [
+                        { text: "-1 < x < 3", correct: true },
+                        { text: "x < -1 或 x > 3", correct: false },
+                        { text: "-3 < x < 1", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: 5, c: -6, op: '<',
+                    exprHtml: "-x<sup>2</sup> + 5x - 6 &lt; 0",
+                    steps: [
+                        "1. -(x - 2)(x - 3) = 0，交點 x = 2 及 x = 3。",
+                        "2. a = -1 < 0 開口向下，< 0 取 x 軸下方兩端。",
+                        "3. 最終解：x &lt; 2 或 x &gt; 3"
+                    ],
+                    options: [
+                        { text: "x < 2 或 x > 3", correct: true },
+                        { text: "2 < x < 3", correct: false },
+                        { text: "x ≤ 2 或 x ≥ 3", correct: false },
+                        { text: "-3 < x < -2", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: -2, c: 8, op: '<=',
+                    exprHtml: "-x<sup>2</sup> - 2x + 8 &le; 0",
+                    steps: [
+                        "1. -(x + 4)(x - 2) = 0，交點 x = -4 及 x = 2。",
+                        "2. a = -1 < 0 開口向下，≤ 0 取 x 軸下方兩端。",
+                        "3. 最終解：x &le; -4 或 x &ge; 2"
+                    ],
+                    options: [
+                        { text: "x ≤ -4 或 x ≥ 2", correct: true },
+                        { text: "-4 ≤ x ≤ 2", correct: false },
+                        { text: "x ≤ -2 或 x ≥ 4", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: -2, b: 5, c: -2, op: '>',
+                    exprHtml: "-2x<sup>2</sup> + 5x - 2 &gt; 0",
+                    steps: [
+                        "1. -(2x - 1)(x - 2) = 0，交點 x = 0.5 及 x = 2。",
+                        "2. a = -2 < 0 開口向下，> 0 取中間拱形。",
+                        "3. 最終解：0.5 &lt; x &lt; 2"
+                    ],
+                    options: [
+                        { text: "0.5 < x < 2", correct: true },
+                        { text: "x < 0.5 或 x > 2", correct: false },
+                        { text: "-2 < x < -0.5", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: 4, c: 0, op: '>=',
+                    exprHtml: "4x - x<sup>2</sup> &ge; 0",
+                    steps: [
+                        "1. x(4 - x) = 0，交點 x = 0 及 x = 4。",
+                        "2. a = -1 < 0 開口向下，≥ 0 取中間拱形。",
+                        "3. 最終解：0 &le; x &le; 4"
+                    ],
+                    options: [
+                        { text: "0 ≤ x ≤ 4", correct: true },
+                        { text: "x ≤ 0 或 x ≥ 4", correct: false },
+                        { text: "-4 ≤ x ≤ 0", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: 0, c: 9, op: '>',
+                    exprHtml: "9 - x<sup>2</sup> &gt; 0",
+                    steps: [
+                        "1. (3 - x)(3 + x) = 0，交點 x = -3 及 x = 3。",
+                        "2. a = -1 < 0 開口向下，> 0 取中間段。",
+                        "3. 最終解：-3 &lt; x &lt; 3"
+                    ],
+                    options: [
+                        { text: "-3 < x < 3", correct: true },
+                        { text: "x < -3 或 x > 3", correct: false },
+                        { text: "x < 3", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: -3, b: 6, c: 0, op: '<',
+                    exprHtml: "-3x<sup>2</sup> + 6x &lt; 0",
+                    steps: [
+                        "1. -3x(x - 2) = 0，交點 x = 0 及 x = 2。",
+                        "2. a = -3 < 0 開口向下，< 0 取兩端。",
+                        "3. 最終解：x &lt; 0 或 x &gt; 2"
+                    ],
+                    options: [
+                        { text: "x < 0 或 x > 2", correct: true },
+                        { text: "0 < x < 2", correct: false },
+                        { text: "x < -2 或 x > 0", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                }
+            ],
+
+            // Level 3: Delta = 0 (Tangential)
+            3: [
+                {
+                    a: 1, b: -6, c: 9, op: '>',
+                    exprHtml: "x<sup>2</sup> - 6x + 9 &gt; 0",
+                    steps: [
+                        "1. 判別式 Δ = (-6)² - 4(1)(9) = 0，即 (x - 3)² = 0，相切於 x = 3。",
+                        "2. a = 1 > 0 開口向上，除了頂點 (3, 0) 觸碰 x 軸外，其餘全在 x 軸上方。",
+                        "3. 不等號為嚴格 >，剔除 x = 3。",
+                        "4. 最終解：x &ne; 3 的所有實數"
+                    ],
+                    options: [
+                        { text: "x ≠ 3 的所有實數", correct: true },
+                        { text: "所有實數", correct: false },
+                        { text: "x > 3", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: -6, c: 9, op: '<=',
+                    exprHtml: "x<sup>2</sup> - 6x + 9 &le; 0",
+                    steps: [
+                        "1. Δ = 0，拋物線開口向上，觸碰 x 軸於 x = 3。",
+                        "2. 不存在 < 0 的圖像，但 ≤ 0 允許等於 0 (即頂點)。",
+                        "3. 最終解：只有 x = 3"
+                    ],
+                    options: [
+                        { text: "只有 x = 3", correct: true },
+                        { text: "無解", correct: false },
+                        { text: "x ≤ 3", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 4, c: 4, op: '>=',
+                    exprHtml: "x<sup>2</sup> + 4x + 4 &ge; 0",
+                    steps: [
+                        "1. (x + 2)² ≥ 0，Δ = 0，相切於 x = -2。",
+                        "2. a = 1 > 0 開口向上，全圖皆在 x 軸上方或線上。",
+                        "3. 最終解：所有實數"
+                    ],
+                    options: [
+                        { text: "所有實數", correct: true },
+                        { text: "x ≠ -2 的所有實數", correct: false },
+                        { text: "只有 x = -2", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 4, c: 4, op: '<',
+                    exprHtml: "x<sup>2</sup> + 4x + 4 &lt; 0",
+                    steps: [
+                        "1. (x + 2)² < 0，Δ = 0，圖像完全沒有在 x 軸下方。",
+                        "2. 嚴格 < 0 不含頂點。",
+                        "3. 最終解：無解"
+                    ],
+                    options: [
+                        { text: "無解", correct: true },
+                        { text: "x = -2", correct: false },
+                        { text: "x < -2", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: 2, c: -1, op: '<=',
+                    exprHtml: "-x<sup>2</sup> + 2x - 1 &le; 0",
+                    steps: [
+                        "1. -(x - 1)² ≤ 0，Δ = 0，a = -1 < 0 開口向下，切於 x = 1。",
+                        "2. 整條拋物線都在 x 軸下方或線上，符合 ≤ 0。",
+                        "3. 最終解：所有實數"
+                    ],
+                    options: [
+                        { text: "所有實數", correct: true },
+                        { text: "x ≠ 1 的所有實數", correct: false },
+                        { text: "只有 x = 1", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: 2, c: -1, op: '>',
+                    exprHtml: "-x<sup>2</sup> + 2x - 1 &gt; 0",
+                    steps: [
+                        "1. -(x - 1)² > 0，a = -1 < 0 開口向下。",
+                        "2. 完全沒有圖像在 x 軸上方。",
+                        "3. 最終解：無解"
+                    ],
+                    options: [
+                        { text: "無解", correct: true },
+                        { text: "x = 1", correct: false },
+                        { text: "x ≠ 1 的所有實數", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                },
+                {
+                    a: 4, b: -12, c: 9, op: '>=',
+                    exprHtml: "4x<sup>2</sup> - 12x + 9 &ge; 0",
+                    steps: [
+                        "1. (2x - 3)² ≥ 0，Δ = 0，切於 x = 1.5。",
+                        "2. a = 4 > 0 開口向上，≥ 0 涵蓋頂點及上方。",
+                        "3. 最終解：所有實數"
+                    ],
+                    options: [
+                        { text: "所有實數", correct: true },
+                        { text: "x ≠ 1.5 的所有實數", correct: false },
+                        { text: "x ≥ 1.5", correct: false },
+                        { text: "無解", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: -8, c: -16, op: '>=',
+                    exprHtml: "-x<sup>2</sup> - 8x - 16 &ge; 0",
+                    steps: [
+                        "1. -(x + 4)² ≥ 0，a = -1 < 0 開口向下，切於 x = -4。",
+                        "2. 上方無圖像，但 ≥ 0 允許等於 0 (即頂點 x = -4)。",
+                        "3. 最終解：只有 x = -4"
+                    ],
+                    options: [
+                        { text: "只有 x = -4", correct: true },
+                        { text: "無解", correct: false },
+                        { text: "x ≠ -4 的所有實數", correct: false },
+                        { text: "所有實數", correct: false }
+                    ]
+                }
+            ],
+
+            // Level 4: Delta < 0 (Floating)
+            4: [
+                {
+                    a: 1, b: 2, c: 5, op: '>',
+                    exprHtml: "x<sup>2</sup> + 2x + 5 &gt; 0",
+                    steps: [
+                        "1. 判別式 Δ = 2² - 4(1)(5) = -16 < 0，與 x 軸完全無交點。",
+                        "2. a = 1 > 0 開口向上，整條拋物線懸空浮在 x 軸上方。",
+                        "3. 不等號要求 > 0，全部圖像皆滿足！",
+                        "4. 最終解：所有實數"
+                    ],
+                    options: [
+                        { text: "所有實數", correct: true },
+                        { text: "無解", correct: false },
+                        { text: "x > -1", correct: false },
+                        { text: "-2 < x < 5", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 0, c: 4, op: '<',
+                    exprHtml: "x<sup>2</sup> + 4 &lt; 0",
+                    steps: [
+                        "1. Δ = 0² - 4(1)(4) = -16 < 0，無交點。",
+                        "2. a = 1 > 0，整條拋物線在 x 軸上方。",
+                        "3. 要求 < 0 (下方)，完全沒有圖像符合。",
+                        "4. 最終解：無解"
+                    ],
+                    options: [
+                        { text: "無解", correct: true },
+                        { text: "所有實數", correct: false },
+                        { text: "-2 < x < 2", correct: false },
+                        { text: "x < -2", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: -3, c: 6, op: '>=',
+                    exprHtml: "x<sup>2</sup> - 3x + 6 &ge; 0",
+                    steps: [
+                        "1. Δ = (-3)² - 4(1)(6) = -15 < 0，浮在上方。",
+                        "2. a = 1 > 0 開口向上，要求 ≥ 0。",
+                        "3. 最終解：所有實數"
+                    ],
+                    options: [
+                        { text: "所有實數", correct: true },
+                        { text: "無解", correct: false },
+                        { text: "x ≥ 3", correct: false },
+                        { text: "x ≤ 0 或 x ≥ 3", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 1, c: 1, op: '<=',
+                    exprHtml: "x<sup>2</sup> + x + 1 &le; 0",
+                    steps: [
+                        "1. Δ = 1 - 4 = -3 < 0，完全懸空在 x 軸上方。",
+                        "2. 要求 ≤ 0，下方及 x 軸上完全沒有點。",
+                        "3. 最終解：無解"
+                    ],
+                    options: [
+                        { text: "無解", correct: true },
+                        { text: "所有實數", correct: false },
+                        { text: "x = -0.5", correct: false },
+                        { text: "-1 ≤ x ≤ 1", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: 1, c: -2, op: '<',
+                    exprHtml: "-x<sup>2</sup> + x - 2 &lt; 0",
+                    steps: [
+                        "1. Δ = 1 - 8 = -7 < 0，與 x 軸無交點。",
+                        "2. a = -1 < 0 開口向下，整條拋物線沉在 x 軸下方。",
+                        "3. 要求 < 0，全部圖像皆滿足！",
+                        "4. 最終解：所有實數"
+                    ],
+                    options: [
+                        { text: "所有實數", correct: true },
+                        { text: "無解", correct: false },
+                        { text: "x < 1", correct: false },
+                        { text: "-2 < x < 1", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: -2, c: -5, op: '>',
+                    exprHtml: "-x<sup>2</sup> - 2x - 5 &gt; 0",
+                    steps: [
+                        "1. Δ = 4 - 20 = -16 < 0，沉在 x 軸下方。",
+                        "2. a = -1 < 0 開口向下，要求 > 0 (上方)。",
+                        "3. 上方完全無圖像。",
+                        "4. 最終解：無解"
+                    ],
+                    options: [
+                        { text: "無解", correct: true },
+                        { text: "所有實數", correct: false },
+                        { text: "x > -1", correct: false },
+                        { text: "-5 < x < -1", correct: false }
+                    ]
+                },
+                {
+                    a: 2, b: -2, c: 3, op: '>',
+                    exprHtml: "2x<sup>2</sup> - 2x + 3 &gt; 0",
+                    steps: [
+                        "1. Δ = 4 - 24 = -20 < 0，浮在上方。",
+                        "2. a = 2 > 0，要求 > 0。",
+                        "3. 最終解：所有實數"
+                    ],
+                    options: [
+                        { text: "所有實數", correct: true },
+                        { text: "無解", correct: false },
+                        { text: "x > 0.5", correct: false },
+                        { text: "x < 0 或 x > 1", correct: false }
+                    ]
+                },
+                {
+                    a: -2, b: 4, c: -5, op: '>=',
+                    exprHtml: "-2x<sup>2</sup> + 4x - 5 &ge; 0",
+                    steps: [
+                        "1. Δ = 16 - 40 = -24 < 0，沉在下方。",
+                        "2. a = -2 < 0，要求 ≥ 0。",
+                        "3. 最終解：無解"
+                    ],
+                    options: [
+                        { text: "無解", correct: true },
+                        { text: "所有實數", correct: false },
+                        { text: "x = 1", correct: false },
+                        { text: "x ≤ 1", correct: false }
+                    ]
+                }
+            ],
+
+            // Level 5: DSE Paper 2 Unknown k
+            5: [
+                {
+                    a: 1, b: -4, c: 4, op: '>', customK: "若不等式 x² - 4x + k > 0 對所有實數 x 均成立，求 k 的取值範圍。",
+                    exprHtml: "x<sup>2</sup> - 4x + k &gt; 0 (恆成立)",
+                    steps: [
+                        "1. 不等式對所有實數成立，且 a = 1 > 0 (開口向上)。",
+                        "2. 代表拋物線必須完全懸空在 x 軸上方，與 x 軸無交點。",
+                        "3. 因此判別式 Δ < 0 ⇒ (-4)² - 4(1)(k) < 0 ⇒ 16 - 4k < 0。",
+                        "4. 解得：k &gt; 4"
+                    ],
+                    options: [
+                        { text: "k > 4", correct: true },
+                        { text: "k < 4", correct: false },
+                        { text: "k ≥ 4", correct: false },
+                        { text: "k < -4", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 6, c: 9, op: '<=', customK: "若不等式 x² + 6x + k ≤ 0 只有一個實解，求 k 的值。",
+                    exprHtml: "x<sup>2</sup> + 6x + k &le; 0 (唯一解)",
+                    steps: [
+                        "1. a = 1 > 0 開口向上，≤ 0 要有「唯一解」，拋物線必須剛好相切於 x 軸 (頂點)。",
+                        "2. 相切代表判別式 Δ = 0 ⇒ 6² - 4(1)(k) = 0。",
+                        "3. 36 - 4k = 0 ⇒ k = 9。"
+                    ],
+                    options: [
+                        { text: "k = 9", correct: true },
+                        { text: "k > 9", correct: false },
+                        { text: "k < 9", correct: false },
+                        { text: "k = -9", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: -2, c: 0, op: '>', customK: "若方程 x² - 2x + k = 0 有兩個相異實根，求 k 的範圍。",
+                    exprHtml: "x<sup>2</sup> - 2x + k = 0 (兩相異實根)",
+                    steps: [
+                        "1. 有兩個相異實根，代表拋物線與 x 軸有 2 個交點。",
+                        "2. 判別式 Δ > 0 ⇒ (-2)² - 4(1)(k) > 0 ⇒ 4 - 4k > 0。",
+                        "3. 解得：k &lt; 1"
+                    ],
+                    options: [
+                        { text: "k < 1", correct: true },
+                        { text: "k > 1", correct: false },
+                        { text: "k ≤ 1", correct: false },
+                        { text: "k = 1", correct: false }
+                    ]
+                },
+                {
+                    a: -1, b: 4, c: -4, op: '<', customK: "若 -x² + 4x - k < 0 對所有實數 x 恆成立，求 k 的範圍。",
+                    exprHtml: "-x<sup>2</sup> + 4x - k &lt; 0 (恆成立)",
+                    steps: [
+                        "1. a = -1 < 0 開口向下，要對所有 x 均 < 0，抛物線必須完全沉在 x 軸下方。",
+                        "2. 無交點代表判別式 Δ < 0 ⇒ 4² - 4(-1)(-k) < 0 ⇒ 16 - 4k < 0。",
+                        "3. 解得：k &gt; 4"
+                    ],
+                    options: [
+                        { text: "k > 4", correct: true },
+                        { text: "k < 4", correct: false },
+                        { text: "k ≥ 4", correct: false },
+                        { text: "k = 4", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 0, c: 0, op: '<', customK: "若不等式 x² + k < 0 無解，求 k 的取值範圍。",
+                    exprHtml: "x<sup>2</sup> + k &lt; 0 (無解)",
+                    steps: [
+                        "1. a = 1 > 0 開口向上，要使 < 0 無解，代表圖像不能有任何部分在 x 軸下方。",
+                        "2. 拋物線頂點 (0, k) 必須在 x 軸上或上方，即 k ≥ 0。",
+                        "3. 或者利用 Δ ≤ 0 ⇒ 0² - 4(1)(k) ≤ 0 ⇒ -4k ≤ 0 ⇒ k &ge; 0。"
+                    ],
+                    options: [
+                        { text: "k ≥ 0", correct: true },
+                        { text: "k > 0", correct: false },
+                        { text: "k ≤ 0", correct: false },
+                        { text: "k < 0", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: -8, c: 16, op: '>', customK: "若 x² - 8x + k > 0 的解為「x ≠ 4 的所有實數」，求 k 的值。",
+                    exprHtml: "x<sup>2</sup> - 8x + k &gt; 0 (x &ne; 4)",
+                    steps: [
+                        "1. 解為 x ≠ 4，代表拋物線相切於 x = 4，頂點坐標為 (4, 0)。",
+                        "2. 相切代表 Δ = 0 ⇒ (-8)² - 4(1)(k) = 0 ⇒ 64 - 4k = 0。",
+                        "3. 解得：k = 16"
+                    ],
+                    options: [
+                        { text: "k = 16", correct: true },
+                        { text: "k = 8", correct: false },
+                        { text: "k = 4", correct: false },
+                        { text: "k = 64", correct: false }
+                    ]
+                },
+                {
+                    a: 1, b: 2, c: 1, op: '<=', customK: "若二次函數 y = x² + 2x + k 的圖像與 x 軸沒有交點，求 k 的範圍。",
+                    exprHtml: "y = x<sup>2</sup> + 2x + k (與 x 軸無交點)",
+                    steps: [
+                        "1. 圖像是「懸空」無交點，代表判別式 Δ < 0。",
+                        "2. Δ = 2² - 4(1)(k) < 0 ⇒ 4 - 4k < 0。",
+                        "3. 解得：k &gt; 1"
+                    ],
+                    options: [
+                        { text: "k > 1", correct: true },
+                        { text: "k < 1", correct: false },
+                        { text: "k ≥ 1", correct: false },
+                        { text: "k ≤ 1", correct: false }
+                    ]
+                },
+                {
+                    a: 3, b: -6, c: 3, op: '>=', customK: "若 3x² - 6x + k ≥ 0 對所有實數 x 均成立，求 k 的最小值。",
+                    exprHtml: "3x<sup>2</sup> - 6x + k &ge; 0 (恆成立)",
+                    steps: [
+                        "1. a = 3 > 0，要使 ≥ 0 恆成立，拋物線可在 x 軸上方或剛好相切。",
+                        "2. 代表 Δ ≤ 0 ⇒ (-6)² - 4(3)(k) ≤ 0 ⇒ 36 - 12k ≤ 0 ⇒ k ≥ 3。",
+                        "3. 故 k 的最小值為：3"
+                    ],
+                    options: [
+                        { text: "3", correct: true },
+                        { text: "0", correct: false },
+                        { text: "6", correct: false },
+                        { text: "12", correct: false }
+                    ]
+                }
+            ]
+        };
+
+        /* ==================== STATE MANAGEMENT ==================== */
+        let state = {
+            currentTab: 'explore',
+            score: 0,
+            streak: 0,
+            explore: { a: 1, b: -2, c: -3, op: '>' },
+            game: { level: 1, qIndex: 0 },
+            sandbox: { a: 1, b: -4, c: 3, op: '>' }
+        };
+
+        /* ==================== CANVAS GRAPHICAL ENGINE ==================== */
+        function drawParabola(canvasId, a, b, c, op) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Clear Background
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, w, h);
+
+            const originX = w / 2;
+            const originY = h / 2 + 15;
+            const scaleX = 32;
+            const scaleY = 15;
+
+            function toScreenX(x) { return originX + x * scaleX; }
+            function toScreenY(y) { return originY - y * scaleY; }
+
+            // Grid Lines
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let x = -10; x <= 10; x++) {
+                ctx.beginPath(); ctx.moveTo(toScreenX(x), 0); ctx.lineTo(toScreenX(x), h); ctx.stroke();
+            }
+            for (let y = -10; y <= 10; y++) {
+                ctx.beginPath(); ctx.moveTo(0, toScreenY(y)); ctx.lineTo(w, toScreenY(y)); ctx.stroke();
+            }
+
+            // Main Axes
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(w, originY); ctx.stroke(); // X axis
+            ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, h); ctx.stroke(); // Y axis
+
+            // Labels
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 11px Outfit, sans-serif';
+            ctx.fillText('x', w - 12, originY - 6);
+            ctx.fillText('y', originX + 6, 12);
+
+            const f = (x) => a * x * x + b * x + c;
+            const delta = b * b - 4 * a * c;
+
+            // Subtle Background Curve
+            ctx.beginPath();
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2.5;
+            let started = false;
+            for (let px = 0; px <= w; px += 2) {
+                const x = (px - originX) / scaleX;
+                const y = f(x);
+                const py = toScreenY(y);
+                if (!started) { ctx.moveTo(px, py); started = true; }
+                else { ctx.lineTo(px, py); }
+            }
+            ctx.stroke();
+
+            // Highlighted Curve Segments (> 0 Cyan / < 0 Pink)
+            const isGreater = op.includes('>');
+            const isIncludeEqual = op.includes('=');
+
+            ctx.lineWidth = 4.5;
+            ctx.strokeStyle = isGreater ? '#06b6d4' : '#ec4899';
+
+            ctx.beginPath();
+            let active = false;
+            for (let px = 0; px <= w; px += 2) {
+                const x = (px - originX) / scaleX;
+                const y = f(x);
+                const py = toScreenY(y);
+                const match = isGreater ? (y > 0) : (y < 0);
+
+                if (match) {
+                    if (!active) { ctx.moveTo(px, py); active = true; }
+                    else { ctx.lineTo(px, py); }
+                } else {
+                    if (active) { ctx.stroke(); ctx.beginPath(); active = false; }
+                }
+            }
+            if (active) ctx.stroke();
+
+            // Highlight Solution Region Projection on X-Axis
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#10b981'; // Green solution ray
+
+            if (delta > 0 && a !== 0) {
+                const x1 = (-b - Math.sqrt(delta)) / (2 * a);
+                const x2 = (-b + Math.sqrt(delta)) / (2 * a);
+                const rMin = Math.min(x1, x2);
+                const rMax = Math.max(x1, x2);
+                const sxMin = toScreenX(rMin);
+                const sxMax = toScreenX(rMax);
+
+                ctx.beginPath();
+                if ((a > 0 && isGreater) || (a < 0 && !isGreater)) {
+                    // Outer two tails
+                    ctx.moveTo(0, originY); ctx.lineTo(sxMin, originY); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(sxMax, originY); ctx.lineTo(w, originY); ctx.stroke();
+                } else {
+                    // Middle interval
+                    ctx.moveTo(sxMin, originY); ctx.lineTo(sxMax, originY); ctx.stroke();
+                }
+
+                // Roots Dots (Hollow or Solid)
+                [sxMin, sxMax].forEach(sx => {
+                    ctx.beginPath();
+                    ctx.arc(sx, originY, 5, 0, Math.PI * 2);
+                    if (isIncludeEqual) {
+                        ctx.fillStyle = '#10b981'; ctx.fill();
+                    } else {
+                        ctx.fillStyle = '#090d16'; ctx.fill();
+                        ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5; ctx.stroke();
+                    }
+                });
+            } else if (Math.abs(delta) < 1e-5 && a !== 0) {
+                const root = -b / (2 * a);
+                const sx = toScreenX(root);
+
+                if (a > 0 && isGreater && !isIncludeEqual) {
+                    // All except root
+                    ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(sx - 3, originY); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(sx + 3, originY); ctx.lineTo(w, originY); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(sx, originY, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#090d16'; ctx.fill(); ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.stroke();
+                } else if ((a > 0 && isGreater && isIncludeEqual) || (a < 0 && !isGreater && isIncludeEqual)) {
+                    // All real numbers
+                    ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(w, originY); ctx.stroke();
+                } else if ((a > 0 && !isGreater && isIncludeEqual) || (a < 0 && isGreater && isIncludeEqual)) {
+                    // Only root
+                    ctx.beginPath(); ctx.arc(sx, originY, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = '#10b981'; ctx.fill();
+                }
+            } else if (delta < 0) {
+                const allPass = (a > 0 && isGreater) || (a < 0 && !isGreater);
+                if (allPass) {
+                    ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(w, originY); ctx.stroke();
+                }
+            }
+        }
+
+        /* ==================== MODULE 1 CONTROLLER ==================== */
+        function updateExplore() {
+            const a = state.explore.a;
+            const b = -2;
+            const c = -3;
+            const op = state.explore.op;
+
+            drawParabola('explore-canvas', a, b, c, op);
+
+            const aStr = a === 1 ? '' : (a === -1 ? '-' : a);
+            document.getElementById('exp-math-display').innerHTML = `${aStr}x<sup>2</sup> - 2x - 3 ${op.replace('>=', '&ge;').replace('<=', '&le;')} 0`;
+
+            let sol = "";
+            if (a > 0) {
+                if (op === '>') sol = "解集：x &lt; -1 或 x &gt; 3";
+                else if (op === '>=') sol = "解集：x &le; -1 或 x &ge; 3";
+                else if (op === '<') sol = "解集：-1 &lt; x &lt; 3";
+                else if (op === '<=') sol = "解集：-1 &le; x &le; 3";
+            } else {
+                if (op === '>') sol = "解集：-1 &lt; x &lt; 3";
+                else if (op === '>=') sol = "解集：-1 &le; x &le; 3";
+                else if (op === '<') sol = "解集：x &lt; -1 或 x &gt; 3";
+                else if (op === '<=') sol = "解集：x &le; -1 或 x &ge; 3";
+            }
+            document.getElementById('exp-sol-display').innerHTML = sol;
+        }
+
+        function setExploreA(val) {
+            sfx.click();
+            state.explore.a = val;
+            document.getElementById('exp-a-text').innerText = `a = ${val > 0 ? '+1 (開口向上 ∪)' : '-1 (開口向下 ∩)'}`;
+            
+            document.getElementById('btn-exp-a-pos').className = val > 0 
+                ? "py-2 rounded-xl bg-cyan-950 border-2 border-cyan-500 text-cyan-300 font-bold text-xs"
+                : "py-2 rounded-xl bg-slate-900 border-2 border-slate-800 text-slate-400 font-bold text-xs";
+
+            document.getElementById('btn-exp-a-neg').className = val < 0 
+                ? "py-2 rounded-xl bg-purple-950 border-2 border-purple-500 text-purple-300 font-bold text-xs"
+                : "py-2 rounded-xl bg-slate-900 border-2 border-slate-800 text-slate-400 font-bold text-xs";
+
+            updateExplore();
+        }
+
+        function setExploreOp(op) {
+            sfx.click();
+            state.explore.op = op;
+            ['gt', 'gte', 'lt', 'lte'].forEach(s => {
+                document.getElementById(`exp-op-${s}`).className = "py-2 rounded-xl border-2 border-slate-800 bg-slate-900 text-slate-400 font-black text-sm";
+            });
+            const keyMap = { '>': 'gt', '>=': 'gte', '<': 'lt', '<=': 'lte' };
+            document.getElementById(`exp-op-${keyMap[op]}`).className = "py-2 rounded-xl border-2 border-pink-500 bg-pink-950/60 text-pink-300 font-black text-sm";
+
+            updateExplore();
+        }
+
+        /* ==================== MODULE 2 GAME CONTROLLER ==================== */
+        function selectLevel(lvl) {
+            sfx.click();
+            state.game.level = lvl;
+            state.game.qIndex = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`lvl-btn-${i}`);
+                if (i === lvl) {
+                    btn.className = "p-3 rounded-2xl border-2 border-pink-500 bg-pink-950/40 text-left transition shadow-lg shadow-pink-500/20";
+                } else {
+                    btn.className = "p-3 rounded-2xl border-2 border-slate-800 bg-slate-900/60 text-left transition opacity-70 hover:opacity-100";
+                }
+            }
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const list = GAME_DATABASE[state.game.level];
+            if (!list || state.game.qIndex >= list.length) state.game.qIndex = 0;
+
+            const q = list[state.game.qIndex];
+
+            document.getElementById('game-q-badge').innerText = `第 ${state.game.level} 關 - 第 ${state.game.qIndex + 1} / ${list.length} 題`;
+            
+            const probDisplay = document.getElementById('game-problem-display');
+            if (q.customK) {
+                probDisplay.innerHTML = `<div class="text-sm font-bold text-amber-300 leading-normal">${q.customK}</div>`;
+            } else {
+                probDisplay.innerHTML = q.exprHtml;
+            }
+
+            const grid = document.getElementById('game-options-grid');
+            grid.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-card p-4 rounded-2xl text-left font-bold text-sm text-slate-200 hover:text-white flex items-center gap-3 cursor-pointer";
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-pink-400 font-mono font-black shrink-0">${String.fromCharCode(65 + idx)}</span>
+                    <span class="text-sm font-bold font-mono">${opt.text}</span>
+                `;
+                btn.onclick = () => checkAnswer(opt.correct, btn);
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('game-solution-card').classList.add('hidden');
+            drawParabola('game-canvas', q.a, q.b, q.c, q.op);
+        }
+
+        function checkAnswer(isCorrect, btn) {
+            const list = GAME_DATABASE[state.game.level];
+            const q = list[state.game.qIndex];
+            const allBtns = document.getElementById('game-options-grid').querySelectorAll('button');
+
+            allBtns.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                sfx.correct();
+                btn.className = "p-4 rounded-2xl text-left font-bold text-sm bg-emerald-950/80 border-2 border-emerald-500 text-emerald-200 flex items-center gap-3 shadow-lg shadow-emerald-500/20";
+                
+                state.score += 100 + (state.streak * 20);
+                state.streak += 1;
+
+                try {
+                    confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } });
+                } catch(e) {}
+            } else {
+                sfx.wrong();
+                btn.className = "p-4 rounded-2xl text-left font-bold text-sm bg-rose-950/80 border-2 border-rose-500 text-rose-200 flex items-center gap-3 shadow-lg shadow-rose-500/20";
+                state.streak = 0;
+            }
+
+            document.getElementById('score-counter').innerText = state.score;
+            document.getElementById('streak-counter').innerText = state.streak;
+
+            const solCard = document.getElementById('game-solution-card');
+            const solText = document.getElementById('game-solution-text');
+            solText.innerHTML = q.steps.join('<br>');
+            solCard.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            sfx.click();
+            const list = GAME_DATABASE[state.game.level];
+            state.game.qIndex++;
+            if (state.game.qIndex >= list.length) {
+                if (state.game.level < 5) {
+                    selectLevel(state.game.level + 1);
+                } else {
+                    state.game.qIndex = 0;
+                    loadQuestion();
+                }
+            } else {
+                loadQuestion();
+            }
+        }
+
+        /* ==================== MODULE 3 SANDBOX CONTROLLER ==================== */
+        function setSandboxPreset(a, b, c, op) {
+            sfx.click();
+            document.getElementById('sb-input-a').value = a;
+            document.getElementById('sb-input-b').value = b;
+            document.getElementById('sb-input-c').value = c;
+            document.getElementById('sb-select-op').value = op;
+            updateSandbox();
+        }
+
+        function updateSandbox() {
+            const a = parseFloat(document.getElementById('sb-input-a').value) || 1;
+            const b = parseFloat(document.getElementById('sb-input-b').value) || 0;
+            const c = parseFloat(document.getElementById('sb-input-c').value) || 0;
+            const op = document.getElementById('sb-select-op').value;
+
+            drawParabola('sandbox-canvas', a, b, c, op);
+
+            const delta = b * b - 4 * a * c;
+            const vx = (-b / (2 * a)).toFixed(2);
+            const vy = (c - (b * b) / (4 * a)).toFixed(2);
+
+            let html = `<div>• 判別式 Δ = b² - 4ac = (${b})² - 4(${a})(${c}) = <strong class="${delta>0?'text-amber-300':(delta===0?'text-purple-300':'text-emerald-400')}">${delta}</strong></div>`;
+            html += `<div>• 開口方向：a = ${a} (${a > 0 ? '向上 ∪' : '向下 ∩'})，頂點坐標為 (${vx}, ${vy})</div>`;
+
+            if (delta > 0) {
+                const x1 = (-b - Math.sqrt(delta)) / (2 * a);
+                const x2 = (-b + Math.sqrt(delta)) / (2 * a);
+                const rMin = Math.min(x1, x2).toFixed(2);
+                const rMax = Math.max(x1, x2).toFixed(2);
+                html += `<div>• 與 x 軸交於兩點：x₁ = ${rMin}, x₂ = ${rMax}</div>`;
+            } else if (delta === 0) {
+                html += `<div>• 與 x 軸相切於一點：x = ${vx}</div>`;
+            } else {
+                html += `<div>• 與 x 軸完全沒有交點（懸空特例）</div>`;
+            }
+
+            document.getElementById('sb-analysis-output').innerHTML = html;
+        }
+
+        /* ==================== GLOBAL NAVIGATION ==================== */
+        function switchTab(tab) {
+            sfx.click();
+            state.currentTab = tab;
+
+            document.getElementById('view-explore').classList.add('hidden');
+            document.getElementById('view-game').classList.add('hidden');
+            document.getElementById('view-sandbox').classList.add('hidden');
+
+            ['explore', 'game', 'sandbox'].forEach(t => {
+                document.getElementById(`tab-btn-${t}`).className = "px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap";
+            });
+
+            document.getElementById(`tab-btn-${tab}`).className = "px-5 py-3 rounded-2xl font-black text-sm flex items-center gap-2.5 transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/30 whitespace-nowrap";
+
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+
+            if (tab === 'explore') updateExplore();
+            if (tab === 'game') selectLevel(state.game.level);
+            if (tab === 'sandbox') updateSandbox();
+        }
+
+        // Initialize App on Window Load
+        window.onload = function() {
+            updateExplore();
+
+            document.getElementById('sound-toggle-btn').addEventListener('click', () => {
+                sfx.enabled = !sfx.enabled;
+                const icon = document.getElementById('sound-icon');
+                icon.className = sfx.enabled 
+                    ? "fa-solid fa-volume-high text-lg text-pink-400" 
+                    : "fa-solid fa-volume-xmark text-lg text-slate-500";
+            });
+        };
+    </script>
+</body>
+</html>
